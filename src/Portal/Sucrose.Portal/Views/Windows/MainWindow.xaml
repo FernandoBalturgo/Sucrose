@@ -102,6 +102,13 @@
                     Icon="{ui:SymbolIcon Gift16}"
                     TargetPageType="{x:Type pages:StorePage}"
                     ToolTipService.ToolTip="{DynamicResource Portal.MainWindow.MenuStoreTip}" />
+                <ui:NavigationViewItem
+                    Name="SteamGeneral"
+                    Content="Steam"
+                    Cursor="Hand"
+                    Icon="{ui:SymbolIcon Games24}"
+                    TargetPageType="{x:Type pages:SteamStorePage}"
+                    ToolTipService.ToolTip="{DynamicResource Portal.SteamPage.Title}" />
 
                 <ui:NavigationViewItem
                     Name="Setting1"

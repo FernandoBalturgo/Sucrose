@@ -34,6 +34,7 @@ using SPVPSDSP = Sucrose.Portal.Views.Pages.Setting.DonateSettingPage;
 using SPVPSGSP = Sucrose.Portal.Views.Pages.Setting.GeneralSettingPage;
 using SPVPSOSP = Sucrose.Portal.Views.Pages.Setting.OtherSettingPage;
 using SPVPSP = Sucrose.Portal.Views.Pages.StorePage;
+using SPVPSteam = Sucrose.Portal.Views.Pages.SteamStorePage;
 using SPVPSPESP = Sucrose.Portal.Views.Pages.Setting.PerformanceSettingPage;
 using SPVPSPLSP = Sucrose.Portal.Views.Pages.Setting.PersonalSettingPage;
 using SPVPSSSP = Sucrose.Portal.Views.Pages.Setting.SystemSettingPage;
@@ -92,6 +93,8 @@ namespace Sucrose.Portal
 
                 services.AddTransient<SPVPSP>();
                 services.AddTransient<SPVMPSVM>();
+
+                services.AddTransient<SPVPSteam>();
 
                 services.AddTransient<SPVPSDSP>();
                 services.AddTransient<SPVMPDSVM>();

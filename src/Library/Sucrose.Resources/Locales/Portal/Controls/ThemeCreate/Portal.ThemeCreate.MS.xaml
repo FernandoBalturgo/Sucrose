@@ -53,7 +53,7 @@
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Delete">Batal</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Title">Pilih Fail Gif</system:String>
-    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Fail Gif (*.gif)|*.gif</system:String>
+    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Fail Gif (*.gif, *.png, *.jpg, *.jpeg, *.bmp)|*.gif;*.png;*.jpg;*.jpeg;*.bmp</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Title">Pilih Fail Video</system:String>
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Filter">Fail Video (*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4)|*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4</system:String>

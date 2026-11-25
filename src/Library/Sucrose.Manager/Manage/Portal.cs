@@ -17,6 +17,13 @@ namespace Sucrose.Manager.Manage
 
         public static int AdaptiveLayout => SHS.Clamp(SMMI.PortalSettingManager.GetSettingStable(SMMCP.AdaptiveLayout, 0), 0, 100);
 
+        public static string SteamApiKey => SMMI.PortalSettingManager.GetSettingStable(SMMCP.SteamApiKey, string.Empty);
+
+        public static void SetSteamApiKey(string Value)
+        {
+            SMMI.PortalSettingManager.SetSetting(SMMCP.SteamApiKey, Value ?? string.Empty);
+        }
+
         public static void SetAdaptiveLayout(int Value)
         {
             int NewValue = SHS.Clamp(Value, 0, 100);

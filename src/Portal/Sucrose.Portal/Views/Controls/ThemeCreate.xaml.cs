@@ -1136,7 +1136,7 @@ namespace Sucrose.Portal.Views.Controls
                             {
                                 string Extension = Path.GetExtension(Record).ToLowerInvariant();
 
-                                if (Extension is ".gif")
+                                if (Extension is ".gif" or ".png" or ".jpg" or ".jpeg" or ".bmp")
                                 {
                                     GifDescription.Text = SPETC.GetDescription(Path.GetFileNameWithoutExtension(Record), SSDEWT.Gif);
                                     GifTitle.Text = SPETC.GetTitle(Path.GetFileNameWithoutExtension(Record));

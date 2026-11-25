@@ -53,7 +53,7 @@
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Delete">撤销</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Title">选择 Gif 文件</system:String>
-    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Gif 文件 (*.gif)|*.gif</system:String>
+    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Gif 文件 (*.gif, *.png, *.jpg, *.jpeg, *.bmp)|*.gif;*.png;*.jpg;*.jpeg;*.bmp</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Title">选择视频文件</system:String>
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Filter">视频文件 (*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4)|*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4</system:String>

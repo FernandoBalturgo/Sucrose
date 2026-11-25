@@ -53,7 +53,7 @@
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Delete">पूर्व वस्तुओं को हटाएँ</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Title">Gif फ़ाइल चुनें</system:String>
-    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Gif फ़ाइलें (*.gif)|*.gif</system:String>
+    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Gif फ़ाइलें (*.gif, *.png, *.jpg, *.jpeg, *.bmp)|*.gif;*.png;*.jpg;*.jpeg;*.bmp</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Title">वीडियो फ़ाइल चुनें</system:String>
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Filter">वीडियो फ़ाइलें (*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4)|*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4</system:String>

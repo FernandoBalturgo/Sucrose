@@ -53,7 +53,7 @@
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Delete">Ongedaan Maken</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Title">Selecteer Gif-bestand</system:String>
-    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Gif-bestanden (*.gif)|*.gif</system:String>
+    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Gif-bestanden (*.gif, *.png, *.jpg, *.jpeg, *.bmp)|*.gif;*.png;*.jpg;*.jpeg;*.bmp</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Title">Selecteer Videobestand</system:String>
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Filter">Videobestanden (*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4)|*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4</system:String>

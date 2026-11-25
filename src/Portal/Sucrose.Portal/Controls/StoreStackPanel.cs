@@ -27,8 +27,38 @@ namespace Sucrose.Portal.Controls
             (d as StoreStackPanel)?.InvalidateMeasure();
         }
 
+        private bool UseGrid(double Width)
+        {
+            return MaxItemsPerRow is > 0 and <= 100 && !double.IsInfinity(Width) && Width > 0;
+        }
+
+        private double CellWidth(double Width)
+        {
+            return Math.Max(0, Math.Floor((Width - (ItemMargin.Left + ItemMargin.Right) * MaxItemsPerRow) / MaxItemsPerRow));
+        }
+
         protected override Size MeasureOverride(Size availableSize)
         {
+            if (UseGrid(availableSize.Width))
+            {
+                InternalChildren
+                    .OfType<UIElement>()
+                    .Where(Element => Element.Visibility != Visibility.Visible)
+                    .ToList()
+                    .ForEach(InternalChildren.Remove);
+
+                double Cell = CellWidth(availableSize.Width);
+
+                foreach (UIElement Child in InternalChildren)
+                {
+                    Child.Measure(new Size(Cell, Cell));
+                }
+
+                int Rows = (int)Math.Ceiling(InternalChildren.Count / (double)MaxItemsPerRow);
+
+                return new Size(availableSize.Width, Rows * (Cell + ItemMargin.Top + ItemMargin.Bottom));
+            }
+
             double x = 0;
             double y = 0;
 
@@ -47,13 +77,6 @@ namespace Sucrose.Portal.Controls
                 double ChildWidth = double.PositiveInfinity;
 
                 double ChildHeight = availableSize.Height;
-
-                if (MaxItemsPerRow > 0 && availableSize.Width > 0)
-                {
-                    ChildWidth = Math.Max(0, (availableSize.Width - (ItemMargin.Left + ItemMargin.Right) * MaxItemsPerRow) / MaxItemsPerRow);
-
-                    ChildHeight = ChildWidth;
-                }
 
                 foreach (UIElement child in InternalChildren)
                 {
@@ -86,6 +109,27 @@ namespace Sucrose.Portal.Controls
 
         protected override Size ArrangeOverride(Size finalSize)
         {
+            if (UseGrid(finalSize.Width))
+            {
+                double Cell = CellWidth(finalSize.Width);
+
+                double Slot = Cell + ItemMargin.Left + ItemMargin.Right;
+
+                double RowHeight = Cell + ItemMargin.Top + ItemMargin.Bottom;
+
+                for (int i = 0; i < InternalChildren.Count; i++)
+                {
+                    int Row = i / MaxItemsPerRow;
+                    int Column = i % MaxItemsPerRow;
+
+                    InternalChildren[i].Arrange(new Rect(Column * Slot + ItemMargin.Left, Row * RowHeight + ItemMargin.Top, Cell, Cell));
+                }
+
+                int Rows = (int)Math.Ceiling(InternalChildren.Count / (double)MaxItemsPerRow);
+
+                return new Size(finalSize.Width, Rows * RowHeight);
+            }
+
             double yOffset = 0;
 
             double rowWidth = 0;

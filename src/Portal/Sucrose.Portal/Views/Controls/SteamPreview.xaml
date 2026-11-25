@@ -1,0 +1,101 @@
+<ui:ContentDialog
+    x:Class="Sucrose.Portal.Views.Controls.SteamPreview"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Sucrose.Portal.Views.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="{DynamicResource Portal.StoreCard.TitleText}"
+    d:DesignHeight="600"
+    d:DesignWidth="900"
+    CloseButtonText="{DynamicResource Portal.ThemeReport.Close}"
+    DialogMaxWidth="1000"
+    Loaded="ContentDialog_Loaded"
+    mc:Ignorable="d">
+
+    <ui:ContentDialog.Resources>
+        <Style BasedOn="{StaticResource {x:Type ui:ContentDialog}}" TargetType="{x:Type local:SteamPreview}" />
+    </ui:ContentDialog.Resources>
+
+    <Grid MinWidth="400">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border
+            Grid.Row="0"
+            Height="560"
+            ClipToBounds="True"
+            CornerRadius="10">
+            <Image
+                x:Name="Imagine"
+                Stretch="Uniform" />
+        </Border>
+
+        <ui:Card Grid.Row="1" Margin="0,10,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel
+                    Grid.Column="0"
+                    Margin="0,0,10,0"
+                    VerticalAlignment="Center">
+                    <ui:TextBlock
+                        x:Name="ThemeTitle"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap" />
+                    <ui:TextBlock
+                        x:Name="ThemeDescription"
+                        Margin="0,5,0,0"
+                        FontSize="13"
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="Wrap" />
+                    <ui:TextBlock
+                        x:Name="ThemeMeta"
+                        Margin="0,5,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource TextPlaceholderColorBrush}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center">
+                    <ui:Button
+                        x:Name="Download"
+                        Height="48"
+                        Margin="0,0,6,0"
+                        Padding="14,0"
+                        Click="Download_Click">
+                        <Grid>
+                            <ui:SymbolIcon
+                                x:Name="DownloadSymbol"
+                                Symbol="CloudArrowDown24" />
+                            <ui:ProgressRing
+                                x:Name="DownloadRing"
+                                IsIndeterminate="True"
+                                Visibility="Collapsed" />
+                        </Grid>
+                    </ui:Button>
+                    <ui:Button
+                        x:Name="OpenSteam"
+                        Height="48"
+                        Padding="14,0"
+                        Click="OpenSteam_Click"
+                        Content="{DynamicResource Portal.SteamPage.OpenSteam}"
+                        Icon="{ui:SymbolIcon Open24}" />
+                </StackPanel>
+            </Grid>
+        </ui:Card>
+    </Grid>
+</ui:ContentDialog>
