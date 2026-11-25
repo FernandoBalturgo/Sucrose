@@ -461,9 +461,9 @@ namespace Sucrose.Live.WebView
                                     SSEWVVG Gif = new();
                                     Gif.Show();
                                     break;
+                                //Security hardening: Url wallpapers disabled.
                                 case SSDEWT.Url:
-                                    SSEWVVU Url = new();
-                                    Url.Show();
+                                    Close();
                                     break;
                                 case SSDEWT.Web:
                                     SSEWVVW Web = new();
@@ -473,9 +473,9 @@ namespace Sucrose.Live.WebView
                                     SSEWVVV Video = new();
                                     Video.Show();
                                     break;
+                                //Security hardening: YouTube wallpapers disabled (remote third-party JS).
                                 case SSDEWT.YouTube:
-                                    SSEWVVYT YouTube = new();
-                                    YouTube.Show();
+                                    Close();
                                     break;
                                 default:
                                     Close();

@@ -184,10 +184,7 @@ namespace Sucrose.Live.Aurora
 
                                 switch (SSEMI.Info.Type)
                                 {
-                                    case SSDEWT.Application:
-                                        SSEAVA Application = new();
-                                        Application.Show();
-                                        break;
+                                    //Security hardening: Application wallpapers (launching arbitrary executables) are disabled.
                                     default:
                                         Close();
                                         break;

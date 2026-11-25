@@ -58,6 +58,14 @@ namespace Sucrose.Reportdog.Helper
 
         public async void Start()
         {
+            //Security hardening: telemetry, online pings and remote error reporting are permanently disabled. Nothing is uploaded.
+            if (true)
+            {
+                await Task.CompletedTask;
+
+                return;
+            }
+
             if (SRMI.Watcher == null)
             {
                 if (!Directory.Exists(SRMI.Source))

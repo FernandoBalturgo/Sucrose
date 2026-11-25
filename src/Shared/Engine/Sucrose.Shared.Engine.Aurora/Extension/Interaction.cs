@@ -42,7 +42,7 @@ namespace Sucrose.Shared.Engine.Aurora.Extension
 
                         if (SMME.InputType is SEIT.OnlyKeyboard or SEIT.MouseKeyboard)
                         {
-                            RawInputDevice.RegisterDevice(HidUsageAndPage.Keyboard, RawInputDeviceFlags.ExInputSink | RawInputDeviceFlags.NoLegacy, HWND);
+                            //Security hardening: global keyboard capture removed (system-wide keylogging risk). Wallpapers receive no keystrokes.
                         }
 
                         HwndSource Source = HwndSource.FromHwnd(HWND);

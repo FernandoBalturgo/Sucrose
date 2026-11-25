@@ -121,7 +121,8 @@ namespace Sucrose.Backgroundog.Helper
                     });
                 }
 
-                if (SBMI.PingManagement)
+                //Security hardening: outbound ICMP pings and DNS lookups to external hosts are disabled (network info leak / unnecessary traffic).
+                if (false && SBMI.PingManagement)
                 {
                     SBMI.PingManagement = false;
 

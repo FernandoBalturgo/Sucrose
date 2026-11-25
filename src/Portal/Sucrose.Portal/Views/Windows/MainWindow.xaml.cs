@@ -288,7 +288,7 @@ namespace Sucrose.Portal.Views.Windows
                 {
                     try
                     {
-                        if (SMMG.TelemetryData)
+                        if (false && SMMG.TelemetryData)
                         {
                             SSSMSTD SearchData = new()
                             {

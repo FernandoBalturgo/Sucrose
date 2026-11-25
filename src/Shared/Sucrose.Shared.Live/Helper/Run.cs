@@ -53,8 +53,8 @@ namespace Sucrose.Shared.Live.Helper
                             case SSDEWT.Gif:
                                 SSSHP.Run(SSSMI.Commandog, $"{SMMRG.StartCommand}{SSDECT.Live}{SMMRG.ValueSeparator}{SSSMI.EngineLive[SSDMME.Gif]}");
                                 break;
+                            //Security hardening: Url (arbitrary remote site + JS), YouTube (remote third-party JS) and Application (arbitrary executable) wallpapers are disabled.
                             case SSDEWT.Url:
-                                SSSHP.Run(SSSMI.Commandog, $"{SMMRG.StartCommand}{SSDECT.Live}{SMMRG.ValueSeparator}{SSSMI.EngineLive[SSDMME.Url]}");
                                 break;
                             case SSDEWT.Web:
                                 SSSHP.Run(SSSMI.Commandog, $"{SMMRG.StartCommand}{SSDECT.Live}{SMMRG.ValueSeparator}{SSSMI.EngineLive[SSDMME.Web]}");
@@ -63,10 +63,7 @@ namespace Sucrose.Shared.Live.Helper
                                 SSSHP.Run(SSSMI.Commandog, $"{SMMRG.StartCommand}{SSDECT.Live}{SMMRG.ValueSeparator}{SSSMI.EngineLive[SSDMME.Video]}");
                                 break;
                             case SSDEWT.YouTube:
-                                SSSHP.Run(SSSMI.Commandog, $"{SMMRG.StartCommand}{SSDECT.Live}{SMMRG.ValueSeparator}{SSSMI.EngineLive[SSDMME.YouTube]}");
-                                break;
                             case SSDEWT.Application:
-                                SSSHP.Run(SSSMI.Commandog, $"{SMMRG.StartCommand}{SSDECT.Live}{SMMRG.ValueSeparator}{SSSMI.EngineLive[SSDMME.Application]}");
                                 break;
                             default:
                                 break;

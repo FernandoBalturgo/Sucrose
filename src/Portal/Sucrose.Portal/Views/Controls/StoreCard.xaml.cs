@@ -158,7 +158,7 @@ namespace Sucrose.Portal.Views.Controls
         {
             try
             {
-                if (SMMG.TelemetryData)
+                if (false && SMMG.TelemetryData)
                 {
                     SSSMDTD DownloadData = new()
                     {

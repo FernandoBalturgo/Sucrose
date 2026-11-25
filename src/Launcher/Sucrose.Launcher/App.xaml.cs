@@ -146,18 +146,12 @@ namespace Sucrose.Launcher
 
             SMMI.LauncherLogManager.Log(SELLT.Info, "Server initialized..");
 
-            SMMI.LauncherLogManager.Log(SELLT.Info, "Discord hook initializing..");
-
-            Discord.Initialize();
-
-            SMMI.LauncherLogManager.Log(SELLT.Info, "Discord hook initialized..");
+            //Security hardening: Discord Rich Presence removed (it leaked usage activity to a third party).
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
-
-            Discord.Dispose();
 
             SSMI.LauncherManager.StopChannel();
 

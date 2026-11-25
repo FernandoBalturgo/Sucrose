@@ -159,7 +159,7 @@ namespace Sucrose.Shared.Engine.WebView.Event
         {
             CoreWebView2Certificate Certificate = e.ServerCertificate;
 
-            e.Action = CoreWebView2ServerCertificateErrorAction.AlwaysAllow;
+            e.Action = CoreWebView2ServerCertificateErrorAction.Cancel;
         }
     }
 }

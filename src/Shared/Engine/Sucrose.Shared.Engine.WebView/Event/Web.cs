@@ -112,6 +112,14 @@ namespace Sucrose.Shared.Engine.WebView.Event
 
             SSEWVMI.WebEngine.CoreWebView2.DownloadStarting += WebEngineDownloadStarting;
 
+            SSEWVMI.WebEngine.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+            SSEWVMI.WebEngine.CoreWebView2.WebResourceRequested += WebEngineWebResourceRequested;
+            SSEWVMI.WebEngine.CoreWebView2.NewWindowRequested += WebEngineNewWindowRequested;
+            SSEWVMI.WebEngine.CoreWebView2.NavigationStarting += WebEngineNavigationStarting;
+            SSEWVMI.WebEngine.CoreWebView2.PermissionRequested += WebEnginePermissionRequested;
+            SSEWVMI.WebEngine.CoreWebView2.Settings.IsPasswordAutosaveEnabled = false;
+            SSEWVMI.WebEngine.CoreWebView2.Settings.IsGeneralAutofillEnabled = false;
+
             SSEWVMI.WebEngine.CoreWebView2.ProcessFailed += WebEngineProcessFailed;
 
             SSEWVHW.StartCompatible();
@@ -138,9 +146,50 @@ namespace Sucrose.Shared.Engine.WebView.Event
 
         public static void WebEngineServerCertificateErrorDetected(object sender, CoreWebView2ServerCertificateErrorDetectedEventArgs e)
         {
-            CoreWebView2Certificate Certificate = e.ServerCertificate;
+            //Security hardening: never accept invalid TLS certificates.
+            e.Action = CoreWebView2ServerCertificateErrorAction.Cancel;
+        }
 
-            e.Action = CoreWebView2ServerCertificateErrorAction.AlwaysAllow;
+        private static bool IsLocalUri(string Value)
+        {
+            if (!Uri.TryCreate(Value, UriKind.Absolute, out Uri Target))
+            {
+                return false;
+            }
+
+            return Target.Scheme switch
+            {
+                "data" or "blob" or "about" or "file" => true,
+                "http" or "https" or "ws" or "wss" => Target.IsLoopback,
+                _ => false
+            };
+        }
+
+        //Security hardening: a web wallpaper may only load local content. Any remote request (tracking, exfiltration, remote script) is blocked.
+        private static void WebEngineWebResourceRequested(object sender, CoreWebView2WebResourceRequestedEventArgs e)
+        {
+            if (!IsLocalUri(e.Request.Uri))
+            {
+                e.Response = SSEWVMI.WebEngine.CoreWebView2.Environment.CreateWebResourceResponse(null, 403, "Blocked", string.Empty);
+            }
+        }
+
+        private static void WebEngineNewWindowRequested(object sender, CoreWebView2NewWindowRequestedEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private static void WebEngineNavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
+        {
+            if (!IsLocalUri(e.Uri))
+            {
+                e.Cancel = true;
+            }
+        }
+
+        private static void WebEnginePermissionRequested(object sender, CoreWebView2PermissionRequestedEventArgs e)
+        {
+            e.State = CoreWebView2PermissionState.Deny;
         }
     }
 }

@@ -179,16 +179,8 @@ namespace Sucrose.Update
 
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-            if (SSSHI.Basic(SMMRM.Update, SMMRA.Update))
-            {
-                SMMI.UpdateSettingManager.SetSetting(SMMCU.State, false);
-
-                Configure(e.Args);
-            }
-            else
-            {
-                Close();
-            }
+            //Security hardening: the auto-updater (network download + execution of installers) is disabled. Update manually from a trusted source.
+            Close();
         }
     }
 }

@@ -160,45 +160,26 @@ namespace Sucrose.Shared.Engine.Manage
             "--disable-third-party-extensions",
 
             "--multi-threaded-message-loop",
-            "--no-sandbox",
 
             "--disable-back-forward-cache",
 
-            "--disable-web-security",
             "--disable-geolocation",
-            "--disable-oor-cors",
 
             "--disable-surfaces",
 
             "--autoplay-policy=no-user-gesture-required",
 
-            "--enable-media-stream",
             "--enable-accelerated-video-decode",
 
-            "--allow-running-insecure-content",
-            "--use-fake-ui-for-media-stream",
-            "--enable-usermedia-screen-capture",
             "--enable-usermedia-screen-capturing",
-            "--debug-plugin-loading",
-            "--allow-outdated-plugins",
-            "--always-authorize-plugins",
-            "--enable-npapi",
 
             "--disable-speech-input",
 
-            "--allow-file-access",
-            "--allow-file-access-from-files",
-            "--allow-file-access-from-file-urls",
-            "--allow-universal-access-from-files",
 
-            "--unsafely-disable-devtools-self-xss-warnings",
 
-            "--disable-site-isolation-trials",
-            "--disable-blink-features=BlockCredentialedSubresources",
 
             "--enable-features=ThirdPartyStoragePartitioning,PartitionedCookies",
 
-            "--disable-features=MediaEngagementBypassAutoplayPolicies,CrossSiteDocumentBlockingIfIsolating,BlockInsecurePrivateNetworkRequests,CrossSiteDocumentBlockingAlways,PreloadMediaEngagementData,HardwareMediaKeyHandling,OutOfBlinkCors,IsolateOrigins"
         ];
 
         public static Dictionary<string, string> CefArguments = new()
@@ -220,41 +201,23 @@ namespace Sucrose.Shared.Engine.Manage
 
             ["disable-back-forward-cache"] = "1",
 
-            ["disable-web-security"] = "1",
             ["disable-geolocation"] = "1",
-            ["disable-oor-cors"] = "1",
 
             ["disable-surfaces"] = "1",
 
             ["autoplay-policy"] = "no-user-gesture-required",
 
-            ["enable-media-stream"] = "1",
             ["enable-accelerated-video-decode"] = "1",
 
-            ["allow-running-insecure-content"] = "1",
-            ["use-fake-ui-for-media-stream"] = "1",
-            ["enable-usermedia-screen-capture"] = "1",
             ["enable-usermedia-screen-capturing"] = "1",
-            ["debug-plugin-loading"] = "1",
-            ["allow-outdated-plugins"] = "1",
-            ["always-authorize-plugins"] = "1",
-            ["enable-npapi"] = "1",
 
             ["disable-speech-input"] = "1",
 
-            ["allow-file-access"] = "1",
-            ["allow-file-access-from-files"] = "1",
-            ["allow-file-access-from-file-urls"] = "1",
-            ["allow-universal-access-from-files"] = "1",
 
-            ["unsafely-disable-devtools-self-xss-warnings"] = "1",
 
-            ["disable-site-isolation-trials"] = "1",
-            ["disable-blink-features"] = "BlockCredentialedSubresources",
 
             ["enable-features"] = "ThirdPartyStoragePartitioning,PartitionedCookies",
 
-            ["disable-features"] = "MediaEngagementBypassAutoplayPolicies,CrossSiteDocumentBlockingIfIsolating,BlockInsecurePrivateNetworkRequests,CrossSiteDocumentBlockingAlways,PreloadMediaEngagementData,HardwareMediaKeyHandling,OutOfBlinkCors,IsolateOrigins"
         };
     }
 }

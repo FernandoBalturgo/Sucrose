@@ -118,6 +118,27 @@ namespace Sucrose.Shared.Engine.CefSharp.Extension
             }
         }
 
+        //Returns null when the resolved path escapes the root folder (path traversal such as ../../secret).
+        private static string SafeCombine(string Root, string Relative)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(Root) || Relative.Contains('\0'))
+                {
+                    return null;
+                }
+
+                string FullRoot = Path.GetFullPath(Root).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+                string Full = Path.GetFullPath(Path.Combine(FullRoot, Relative));
+
+                return Full.StartsWith(FullRoot, StringComparison.OrdinalIgnoreCase) ? Full : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private string GetContentType(string filename)
         {
             return Path.GetExtension(filename).ToLowerInvariant() switch
@@ -171,24 +192,33 @@ namespace Sucrose.Shared.Engine.CefSharp.Extension
             try
             {
                 // Set CORS headers
-                ctx.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-                ctx.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
-                ctx.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+                //Security hardening: no wildcard CORS, read-only, path confined to the wallpaper folders.
+                ctx.Response.Headers.Add("X-Content-Type-Options", "nosniff");
 
-                // Get the requested file path
-                string relativePath = Uri.UnescapeDataString(ctx.Request.Url.RawWithQuery.TrimStart('/'));
+                string Method = $"{ctx.Request.Method}".ToUpperInvariant();
 
-                string themePath = Path.Combine(themeFolder, relativePath);
-                string customPath = Path.Combine(customFolder, relativePath);
+                if (Method != "GET" && Method != "HEAD")
+                {
+                    ctx.Response.StatusCode = 405;
+                    await ctx.Response.Send("Method not allowed.");
+
+                    return;
+                }
+
+                // Get the requested file path (without query string)
+                string relativePath = Uri.UnescapeDataString(ctx.Request.Url.RawWithoutQuery.TrimStart('/'));
+
+                string themePath = SafeCombine(themeFolder, relativePath);
+                string customPath = SafeCombine(customFolder, relativePath);
 
                 string filePath = null;
 
                 // Check if file exists in theme folder first, then custom folder
-                if (File.Exists(themePath))
+                if (themePath != null && File.Exists(themePath))
                 {
                     filePath = themePath;
                 }
-                else if (File.Exists(customPath))
+                else if (customPath != null && File.Exists(customPath))
                 {
                     filePath = customPath;
                 }

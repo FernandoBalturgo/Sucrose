@@ -1,4 +1,4 @@
-using CefSharp;
+﻿using CefSharp;
 using CefSharp.Wpf.HwndHost;
 using Microsoft.Win32;
 using System.Collections;
@@ -335,7 +335,7 @@ namespace Sucrose.Live.CefSharp
                             UserAgent = SMMG.UserAgent,
                             CachePath = SSECSMI.CefPath,
                             PersistSessionCookies = true,
-                            IgnoreCertificateErrors = true,
+                            IgnoreCertificateErrors = false,
                             LocalesDirPath = SSSMI.Locales,
                             LogSeverity = LogSeverity.Default,
                             WindowlessRenderingEnabled = true,
@@ -540,9 +540,9 @@ namespace Sucrose.Live.CefSharp
                                     SSECSVG Gif = new();
                                     Gif.Show();
                                     break;
+                                //Security hardening: Url wallpapers disabled.
                                 case SSDEWT.Url:
-                                    SSECSVU Url = new();
-                                    Url.Show();
+                                    Close();
                                     break;
                                 case SSDEWT.Web:
                                     SSECSVW Web = new();
@@ -552,9 +552,9 @@ namespace Sucrose.Live.CefSharp
                                     SSECSVV Video = new();
                                     Video.Show();
                                     break;
+                                //Security hardening: YouTube wallpapers disabled (remote third-party JS).
                                 case SSDEWT.YouTube:
-                                    SSECSVYT YouTube = new();
-                                    YouTube.Show();
+                                    Close();
                                     break;
                                 default:
                                     Close();

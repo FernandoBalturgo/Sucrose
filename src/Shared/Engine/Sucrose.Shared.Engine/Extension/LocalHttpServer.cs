@@ -124,6 +124,27 @@ namespace Sucrose.Shared.Engine.Extension
             }
         }
 
+        //Returns null when the resolved path escapes the root folder (path traversal such as ../../secret).
+        private static string SafeCombine(string Root, string Relative)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(Root) || Relative.Contains('\0'))
+                {
+                    return null;
+                }
+
+                string FullRoot = Path.GetFullPath(Root).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+                string Full = Path.GetFullPath(Path.Combine(FullRoot, Relative));
+
+                return Full.StartsWith(FullRoot, StringComparison.OrdinalIgnoreCase) ? Full : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private string GetContentType(string filename)
         {
             return Path.GetExtension(filename).ToLowerInvariant() switch
@@ -178,18 +199,36 @@ namespace Sucrose.Shared.Engine.Extension
 
             try
             {
-                response.Headers.Add("Access-Control-Allow-Origin", "*");
-                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
-                response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+                //Security hardening: no wildcard CORS (other sites must not read local files), read-only methods, no sniffing.
+                response.Headers.Add("X-Content-Type-Options", "nosniff");
 
-                string themePath = Path.Combine(themeFolder, Uri.UnescapeDataString(context.Request.Url.LocalPath.TrimStart('/')));
-                string customPath = Path.Combine(customFolder, Uri.UnescapeDataString(context.Request.Url.LocalPath.TrimStart('/')));
+                if (context.Request.HttpMethod != "GET" && context.Request.HttpMethod != "HEAD")
+                {
+                    response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
 
-                if (File.Exists(themePath) || File.Exists(customPath))
+                    return;
+                }
+
+                //Reject DNS-rebinding: only loopback host names are served.
+                string RequestHost = context.Request.Url.Host;
+
+                if (RequestHost != $"{SMMRG.Loopback}" && RequestHost != "localhost")
+                {
+                    response.StatusCode = (int)HttpStatusCode.Forbidden;
+
+                    return;
+                }
+
+                string Relative = Uri.UnescapeDataString(context.Request.Url.LocalPath.TrimStart('/'));
+
+                string themePath = SafeCombine(themeFolder, Relative);
+                string customPath = SafeCombine(customFolder, Relative);
+
+                if ((themePath != null && File.Exists(themePath)) || (customPath != null && File.Exists(customPath)))
                 {
                     string path = string.Empty;
 
-                    if (File.Exists(themePath))
+                    if (themePath != null && File.Exists(themePath))
                     {
                         path = themePath;
                     }

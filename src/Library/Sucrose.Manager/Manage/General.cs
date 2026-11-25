@@ -14,9 +14,9 @@ namespace Sucrose.Manager.Manage
 
         public static string UserAgent => SMMI.GeneralSettingManager.GetSetting(SMMCG.UserAgent, SMMRG.UserAgent);
 
-        public static bool TelemetryData => SMMI.GeneralSettingManager.GetSetting(SMMCG.TelemetryData, true);
+        public static bool TelemetryData => SMMI.GeneralSettingManager.GetSetting(SMMCG.TelemetryData, false);
 
-        public static bool ExceptionData => SMMI.GeneralSettingManager.GetSetting(SMMCG.ExceptionData, true);
+        public static bool ExceptionData => SMMI.GeneralSettingManager.GetSetting(SMMCG.ExceptionData, false);
 
         public static bool AppVisible => SMMI.GeneralSettingManager.GetSetting(SMMCG.AppVisible, true);
 
