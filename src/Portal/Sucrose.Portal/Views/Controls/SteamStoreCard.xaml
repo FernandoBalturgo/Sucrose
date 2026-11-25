@@ -4,23 +4,47 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:xf="clr-namespace:XamlFlair;assembly=XamlFlair.WPF"
-    xf:Animations.Primary="{xf:Animate BasedOn={StaticResource Entered},
-                                       Event=MouseEnter}"
-    xf:Animations.Secondary="{xf:Animate BasedOn={StaticResource Leaved},
-                                         Event=MouseLeave}"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    MinHeight="160"
+    MaxHeight="160"
     Cursor="Hand"
     Loaded="SteamStoreCard_Loaded"
     MouseLeftButtonUp="SteamStoreCard_MouseLeftButtonUp"
     mc:Ignorable="d">
 
     <Border
+        Background="Transparent"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
         ClipToBounds="True"
         CornerRadius="10">
-        <Image
-            x:Name="Imagine"
-            Stretch="UniformToFill" />
+        <Grid>
+            <Image
+                x:Name="Imagine"
+                Stretch="UniformToFill" />
+            <Border
+                VerticalAlignment="Bottom"
+                Opacity="0.75">
+                <Border.Background>
+                    <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorQuarternary}" />
+                </Border.Background>
+                <StackPanel
+                    Margin="6,3"
+                    Orientation="Horizontal">
+                    <ui:TextBlock
+                        x:Name="ThemeType"
+                        FontSize="11"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        TextTrimming="CharacterEllipsis" />
+                    <ui:TextBlock
+                        x:Name="ThemeSize"
+                        Margin="8,0,0,0"
+                        FontSize="11"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Border>
+        </Grid>
     </Border>
 </UserControl>

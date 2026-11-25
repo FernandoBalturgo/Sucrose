@@ -46,6 +46,11 @@
                             KeyDown="SearchBox_KeyDown"
                             PlaceholderText="{DynamicResource Portal.SteamPage.Search}" />
                         <ComboBox
+                            x:Name="TypeFilter"
+                            MinWidth="150"
+                            Margin="0,0,6,6"
+                            SelectionChanged="TypeFilter_SelectionChanged" />
+                        <ComboBox
                             x:Name="SortFilter"
                             MinWidth="150"
                             Margin="0,0,6,6"

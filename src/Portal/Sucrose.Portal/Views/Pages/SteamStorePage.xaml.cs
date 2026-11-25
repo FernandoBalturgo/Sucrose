@@ -6,6 +6,7 @@ using SPS = Sucrose.Portal.Services.SteamService;
 using SPSCPC = Sucrose.Portal.Views.Controls.SteamStoreCard;
 using SPSV = Sucrose.Portal.Services.SteamItem;
 using SRER = Sucrose.Resources.Extension.Resources;
+using SSWEW = Sucrose.Shared.Watchdog.Extension.Watch;
 
 namespace Sucrose.Portal.Views.Pages
 {
@@ -21,10 +22,10 @@ namespace Sucrose.Portal.Views.Pages
 
         private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(5);
 
-        // Well-known Wallpaper Engine Workshop tags (type and genre).
+        // Genre tags used by Wallpaper Engine uploads.
         private static readonly string[] KnownTags =
         [
-            "Video", "Scene", "Web", "Abstract", "Animal", "Anime", "Cartoon", "CGI", "Cyberpunk",
+            "Abstract", "Animal", "Anime", "Cartoon", "CGI", "Cyberpunk",
             "Fantasy", "Game", "Girls", "Guys", "Landscape", "Medieval", "Memes", "MMD", "Music", "Nature", "Pixel art",
             "Relaxing", "Retro", "Sci-Fi", "Sports", "Technology", "Television", "Vehicle"
         ];
@@ -44,7 +45,12 @@ namespace Sucrose.Portal.Views.Pages
 
         private string Search = string.Empty;
 
+        private int FileType = SPS.FileTypeArt;
+
         private string RequiredTag = string.Empty;
+
+        // The mature setting the shown items were loaded with.
+        private bool LoadedAdult = SMMP.StoreAdult;
 
         public SteamStorePage()
         {
@@ -57,6 +63,11 @@ namespace Sucrose.Portal.Views.Pages
             SortFilter.Items.Add(new ComboBoxItem { Content = Text("Updated"), Tag = SPS.QueryUpdated });
             SortFilter.Items.Add(new ComboBoxItem { Content = Text("MostSubscribed"), Tag = SPS.QuerySubscribed });
             SortFilter.SelectedIndex = 0;
+
+            TypeFilter.Items.Add(new ComboBoxItem { Content = Text("Artwork"), Tag = SPS.FileTypeArt });
+            TypeFilter.Items.Add(new ComboBoxItem { Content = Text("Videos"), Tag = SPS.FileTypeVideo });
+            TypeFilter.Items.Add(new ComboBoxItem { Content = Text("Screenshots"), Tag = SPS.FileTypeScreenshot });
+            TypeFilter.SelectedIndex = 0;
 
             TagList.Items.Add(new ListBoxItem { Content = Text("AllTags"), Tag = string.Empty });
 
@@ -93,7 +104,8 @@ namespace Sucrose.Portal.Views.Pages
 
             SMMP.LayoutChanged += LayoutChangedHandler;
 
-            if (ThemeStore.Children.Count == 0)
+            // The mature setting may have changed while this page was not shown.
+            if (ThemeStore.Children.Count == 0 || LoadedAdult != SMMP.StoreAdult)
             {
                 await Load();
             }
@@ -136,7 +148,11 @@ namespace Sucrose.Portal.Views.Pages
 
             try
             {
-                string CacheKey = $"{Key.GetHashCode()}|{QueryType}|{Page}|{Search}|{RequiredTag}";
+                bool Adult = SMMP.StoreAdult;
+
+                LoadedAdult = Adult;
+
+                string CacheKey = $"{Key.GetHashCode()}|{QueryType}|{Page}|{Search}|{FileType}|{RequiredTag}|{Adult}";
 
                 List<SPSV> Result;
 
@@ -149,7 +165,7 @@ namespace Sucrose.Portal.Views.Pages
                 }
                 else
                 {
-                    (Result, Total) = await SPS.QueryFiles(Key, QueryType, Page, PageSize, Search, RequiredTag);
+                    (Result, Total) = await SPS.QueryFiles(Key, QueryType, Page, PageSize, Search, FileType, RequiredTag, Adult);
 
                     Cache[CacheKey] = (DateTime.UtcNow, Result, Total);
                 }
@@ -183,7 +199,9 @@ namespace Sucrose.Portal.Views.Pages
             }
             catch (Exception Exception)
             {
-                ShowStatus(Exception.Message);
+                await SSWEW.Watch_CatchException(Exception);
+
+                ShowStatus($"Failed to fetch wallpapers: {Exception.Message}");
             }
             finally
             {
@@ -258,6 +276,18 @@ namespace Sucrose.Portal.Views.Pages
             }
 
             RequiredTag = (TagList.SelectedItem as ListBoxItem)?.Tag as string ?? string.Empty;
+
+            await Restart();
+        }
+
+        private async void TypeFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (Filling || !IsLoaded)
+            {
+                return;
+            }
+
+            FileType = (TypeFilter.SelectedItem as ComboBoxItem)?.Tag is int Value ? Value : SPS.FileTypeArt;
 
             await Restart();
         }

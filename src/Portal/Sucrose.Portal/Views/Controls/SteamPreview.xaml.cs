@@ -64,14 +64,16 @@ namespace Sucrose.Portal.Views.Controls
 
             ThemeMeta.Text = string.Join(" · ", MetaParts());
 
-            if (SPS.IsSteamUrl(Item.PreviewUrl))
+            string Preview = Item.PreviewUrl;
+
+            if (SPS.IsPreviewUrl(Preview))
             {
                 try
                 {
                     BitmapImage Image = new();
 
                     Image.BeginInit();
-                    Image.UriSource = new Uri(Item.PreviewUrl);
+                    Image.UriSource = new Uri(Preview);
                     Image.DecodePixelWidth = 1000;
                     Image.CacheOption = BitmapCacheOption.OnLoad;
                     Image.EndInit();
@@ -229,7 +231,15 @@ namespace Sucrose.Portal.Views.Controls
 
                 string MediaPath = Path.Combine(LibraryPath, FileName);
 
-                await SPS.Download(FileUrl, MediaPath);
+                // Artwork/screenshots return a directory URL; the real file is <file_url>/<filename>.
+                string DownloadUrl = FileUrl;
+
+                if (DownloadUrl.EndsWith("/", StringComparison.Ordinal) && !string.IsNullOrWhiteSpace(FileName))
+                {
+                    DownloadUrl += Uri.EscapeDataString(FileName);
+                }
+
+                await SPS.Download(DownloadUrl, MediaPath);
 
                 string Media = ResolveMedia(LibraryPath, MediaPath);
 
@@ -375,6 +385,13 @@ namespace Sucrose.Portal.Views.Controls
             return Extension is ".mp4" or ".webm" or ".mov" or ".mkv" or ".gif" or ".png" or ".jpg" or ".jpeg";
         }
 
+        private static bool IsImage(string Path)
+        {
+            string Extension = System.IO.Path.GetExtension(Path).ToLowerInvariant();
+
+            return Extension is ".png" or ".jpg" or ".jpeg" or ".gif" or ".webp";
+        }
+
         private static SSDEWT GetType(string Path)
         {
             string Extension = System.IO.Path.GetExtension(Path).ToLowerInvariant();
@@ -382,6 +399,7 @@ namespace Sucrose.Portal.Views.Controls
             return Extension switch
             {
                 ".gif" or ".png" or ".jpg" or ".jpeg" => SSDEWT.Gif,
+                ".html" or ".htm" => SSDEWT.Web,
                 _ => SSDEWT.Video
             };
         }
