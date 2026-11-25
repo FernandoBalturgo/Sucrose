@@ -42,6 +42,18 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
+    <!--
+        Local/Debug fast path: the Release configuration (used by CI and the
+        publish pipeline) stays fully strict. Debug builds skip the expensive
+        restore audit, in-build code-style enforcement and preview analyzer
+        level, which are the dominant cost of the local build loop.
+    -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <NuGetAudit>false</NuGetAudit>
+        <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+        <AnalysisMode>minimum</AnalysisMode>
+    </PropertyGroup>
+
     <ItemGroup>
         <Folder Include="Properties\" />
     </ItemGroup>

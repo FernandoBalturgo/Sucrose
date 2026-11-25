@@ -30,6 +30,7 @@ using SPVPLP = Sucrose.Portal.Views.Pages.LibraryPage;
 using SPVPSGSP = Sucrose.Portal.Views.Pages.Setting.GeneralSettingPage;
 using SPVPSP = Sucrose.Portal.Views.Pages.StorePage;
 using SPVPSSSP = Sucrose.Portal.Views.Pages.Setting.SystemSettingPage;
+using SRER = Sucrose.Resources.Extension.Resources;
 using SSCHV = Sucrose.Shared.Core.Helper.Version;
 using SSDEACT = Sucrose.Shared.Dependency.Enum.ArgumentCommandType;
 using SSDECT = Sucrose.Shared.Dependency.Enum.CommandType;
@@ -54,6 +55,8 @@ namespace Sucrose.Portal.Views.Windows
 
         private string ActivePage { get; set; }
 
+        private bool LoadingLayout;
+
         public SPVMWMWVM ViewModel { get; }
 
         public MainWindow(SPVMWMWVM ViewModel, INavigationService NavigationService, IServiceProvider ServiceProvider, ISnackbarService SnackbarService, IContentDialogService ContentDialogService)
@@ -62,6 +65,11 @@ namespace Sucrose.Portal.Views.Windows
             DataContext = this;
 
             InitializeComponent();
+
+            LoadingLayout = true;
+            AdaptiveLayout.Value = Math.Max(1, SMMP.AdaptiveLayout);
+            AdaptiveLayout.ToolTip = SRER.GetValue("Portal", "PersonalSettingPage", "Adaptive", "AdaptiveLayout");
+            LoadingLayout = false;
 
             if (SPMMP.BackdropType == WindowBackdropType.Auto)
             {
@@ -208,6 +216,19 @@ namespace Sucrose.Portal.Views.Windows
             ApplyTheme(sender as Button);
 
             Dispose();
+        }
+
+        private void AdaptiveLayout_ValueChanged(object sender, RoutedEventArgs e)
+        {
+            if (LoadingLayout)
+            {
+                return;
+            }
+
+            if (AdaptiveLayout.Value is double Value)
+            {
+                SMMP.SetAdaptiveLayout((int)Value);
+            }
         }
 
         private void OtherOptions_Click(object sender, RoutedEventArgs e)

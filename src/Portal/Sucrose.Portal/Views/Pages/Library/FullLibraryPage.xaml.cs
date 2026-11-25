@@ -108,10 +108,27 @@ namespace Sucrose.Portal.Views.Pages.Library
 
         private async void FullLibraryPage_Loaded(object sender, RoutedEventArgs e)
         {
-            ThemeLibrary.ItemMargin = new Thickness(SMMP.AdaptiveMargin);
-            ThemeLibrary.MaxItemsPerRow = SMMP.AdaptiveLayout;
+            UpdateLayout();
+
+            SMMP.LayoutChanged += LayoutChangedHandler;
 
             await AddThemes(SPMI.SearchService.SearchList, ThemePagination.SelectPage);
+        }
+
+        private void FullLibraryPage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            SMMP.LayoutChanged -= LayoutChangedHandler;
+        }
+
+        private void LayoutChangedHandler(object sender, EventArgs e)
+        {
+            UpdateLayout();
+        }
+
+        private void UpdateLayout()
+        {
+            ThemeLibrary.ItemMargin = new Thickness(SMMP.AdaptiveMargin);
+            ThemeLibrary.MaxItemsPerRow = Math.Max(1, SMMP.AdaptiveLayout);
         }
 
         private async void ThemePagination_SelectPageChanged(object sender, EventArgs e)

@@ -44,13 +44,24 @@ namespace Sucrose.Portal.Controls
                     .ToList()
                     .ForEach(InternalChildren.Remove);
 
+                double ChildWidth = double.PositiveInfinity;
+
+                double ChildHeight = availableSize.Height;
+
+                if (MaxItemsPerRow > 0 && availableSize.Width > 0)
+                {
+                    ChildWidth = Math.Max(0, (availableSize.Width - (ItemMargin.Left + ItemMargin.Right) * MaxItemsPerRow) / MaxItemsPerRow);
+
+                    ChildHeight = ChildWidth;
+                }
+
                 foreach (UIElement child in InternalChildren)
                 {
-                    child.Measure(new Size(double.PositiveInfinity, availableSize.Height));
+                    child.Measure(new Size(ChildWidth, ChildHeight));
 
-                    double childWidth = Math.Min((child as FrameworkElement)?.MaxWidth ?? double.PositiveInfinity, child.DesiredSize.Width) + ItemMargin.Left + ItemMargin.Right;
+                    double childWidth = child.DesiredSize.Width + ItemMargin.Left + ItemMargin.Right;
 
-                    if (x + childWidth > availableSize.Width || (MaxItemsPerRow > 0 && itemsInCurrentRow >= MaxItemsPerRow))
+                    if ((MaxItemsPerRow <= 0 && x + childWidth > availableSize.Width) || (MaxItemsPerRow > 0 && itemsInCurrentRow >= MaxItemsPerRow))
                     {
                         x = 0;
                         y += rowHeight;

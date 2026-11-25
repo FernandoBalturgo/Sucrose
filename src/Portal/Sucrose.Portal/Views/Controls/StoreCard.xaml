@@ -7,10 +7,6 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:xag="https://github.com/XamlAnimatedGif/XamlAnimatedGif"
     xmlns:xf="clr-namespace:XamlFlair;assembly=XamlFlair.WPF"
-    MinWidth="260"
-    MinHeight="160"
-    MaxWidth="400"
-    MaxHeight="160"
     xf:Animations.Primary="{xf:Animate BasedOn={StaticResource Entered},
                                        Event=MouseEnter}"
     xf:Animations.Secondary="{xf:Animate BasedOn={StaticResource Leaved},
@@ -20,7 +16,6 @@
     MouseEnter="StoreCard_MouseEnter"
     MouseLeave="StoreCard_MouseLeave"
     MouseLeftButtonUp="StoreCard_MouseLeftButtonUp"
-    Unloaded="StoreCard_Unloaded"
     mc:Ignorable="d">
 
     <UserControl.ContextMenu>
@@ -132,94 +127,31 @@
                 </Rectangle>
 
                 <Border
-                    x:Name="Preview"
+                    x:Name="InfoBadge"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Bottom"
-                    ClipToBounds="True"
-                    CornerRadius="0,0,10,10">
+                    CornerRadius="0,0,10,10"
+                    Opacity="0.75">
                     <Border.Background>
-                        <SolidColorBrush Opacity="0.75" Color="{DynamicResource SolidBackgroundFillColorQuarternary}" />
+                        <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorQuarternary}" />
                     </Border.Background>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <Canvas
-                            x:Name="Titler"
-                            Grid.Row="0"
-                            Margin="5,5,5,25">
-                            <ui:TextBlock
-                                x:Name="ThemeTitle"
-                                Width="{Binding ActualWidth, ElementName=Titler}"
-                                FontSize="16"
-                                FontWeight="Bold"
-                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                Text="{DynamicResource Portal.StoreCard.TitleText}"
-                                TextTrimming="CharacterEllipsis"
-                                TextWrapping="NoWrap" />
-                        </Canvas>
-                        <Canvas
-                            x:Name="Descriptioner"
-                            Grid.Row="1"
-                            Margin="5,0,5,20">
-                            <ui:TextBlock
-                                x:Name="ThemeDescription"
-                                Width="{Binding ActualWidth, ElementName=Descriptioner}"
-                                FontSize="12"
-                                FontWeight="SemiBold"
-                                Foreground="{DynamicResource TextPlaceholderColorBrush}"
-                                Text="{DynamicResource Portal.StoreCard.DescriptionText}"
-                                TextTrimming="CharacterEllipsis"
-                                TextWrapping="NoWrap" />
-                        </Canvas>
-
-                        <ui:Button
-                            x:Name="Download"
-                            Grid.Row="0"
-                            Grid.RowSpan="2"
-                            Grid.Column="1"
-                            Width="41.06"
-                            Padding="0"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Stretch"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Appearance="Transparent"
-                            BorderBrush="Transparent"
-                            Click="Download_Click">
-                            <Grid>
-                                <ui:SymbolIcon
-                                    x:Name="IncompatibleVersion"
-                                    Width="36"
-                                    Cursor="Hand"
-                                    FontSize="36"
-                                    Foreground="{DynamicResource PaletteRedBrush}"
-                                    Symbol="BoxDismiss24"
-                                    ToolTipService.ToolTip="{DynamicResource Portal.StoreCard.VersionTip}"
-                                    Visibility="Collapsed" />
-                                <ui:SymbolIcon
-                                    x:Name="DownloadSymbol"
-                                    Width="36"
-                                    Cursor="Hand"
-                                    FontSize="36"
-                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                    Symbol="CloudArrowDown24" />
-                                <ui:ProgressRing
-                                    x:Name="DownloadRing"
-                                    Width="36"
-                                    Height="36"
-                                    Progress="0"
-                                    Visibility="Collapsed" />
-                                <!--<Image Source="pack://application:,,,/Assets/Icon/DownloadFromCloud.png"/>-->
-                            </Grid>
-                        </ui:Button>
-                    </Grid>
+                    <StackPanel
+                        Margin="6,2"
+                        Orientation="Horizontal">
+                        <ui:TextBlock
+                            x:Name="ThemeType"
+                            FontSize="11"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                            TextTrimming="CharacterEllipsis" />
+                        <ui:TextBlock
+                            x:Name="ThemeSize"
+                            Margin="8,0,0,0"
+                            FontSize="11"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                            TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
                 </Border>
             </Grid>
         </Grid>

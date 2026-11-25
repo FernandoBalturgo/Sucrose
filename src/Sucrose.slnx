@@ -69,6 +69,7 @@
       <Platform Solution="*|x64" Project="x64" />
       <Platform Solution="*|x86" Project="x86" />
     </Project>
+    <!-- Disabled (kept for later): alt engines Nebula/Vexana/VlcPlayer/WebView/Xavier
     <Project Path="Live/Sucrose.Live.Nebula/Sucrose.Live.Nebula.csproj">
       <Platform Solution="*|ARM64" Project="ARM64" />
       <Platform Solution="*|x64" Project="x64" />
@@ -94,6 +95,7 @@
       <Platform Solution="*|x64" Project="x64" />
       <Platform Solution="*|x86" Project="x86" />
     </Project>
+    -->
   </Folder>
   <Folder Name="/Portal/">
     <Project Path="Portal/Sucrose.Portal/Sucrose.Portal.csproj">
@@ -118,6 +120,7 @@
       <Platform Solution="*|x64" Project="x64" />
       <Platform Solution="*|x86" Project="x86" />
     </Project>
+    <!-- Disabled (kept for later): Reportdog, Undo
     <Project Path="Project/Sucrose.Reportdog/Sucrose.Reportdog.csproj">
       <Platform Solution="*|ARM64" Project="ARM64" />
       <Platform Solution="*|x64" Project="x64" />
@@ -128,6 +131,7 @@
       <Platform Solution="*|x64" Project="x64" />
       <Platform Solution="*|x86" Project="x86" />
     </Project>
+    -->
     <Project Path="Project/Sucrose.Watchdog/Sucrose.Watchdog.csproj">
       <Platform Solution="*|ARM64" Project="ARM64" />
       <Platform Solution="*|x64" Project="x64" />
@@ -169,6 +173,7 @@
     <File Path="../global.json" />
     <File Path="../NuGet.Config" />
   </Folder>
+  <!-- Disabled (kept for later): Update
   <Folder Name="/Update/">
     <Project Path="Update/Sucrose.Update/Sucrose.Update.csproj">
       <Platform Solution="*|ARM64" Project="ARM64" />
@@ -176,4 +181,5 @@
       <Platform Solution="*|x86" Project="x86" />
     </Project>
   </Folder>
+  -->
 </Solution>
