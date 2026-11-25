@@ -35,5 +35,7 @@
         public const string LibraryPagination = "LibraryPagination";
 
         public const string LibraryPreviewHide = "LibraryPreviewHide";
+
+        public const string SteamApiKey = "SteamApiKey";
     }
 }

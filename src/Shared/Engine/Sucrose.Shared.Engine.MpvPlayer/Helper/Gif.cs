@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using SSEHS = Sucrose.Shared.Engine.Helper.Source;
 using SSEMPMI = Sucrose.Shared.Engine.MpvPlayer.Manage.Internal;
 using SSWEW = Sucrose.Shared.Watchdog.Extension.Watch;
 
@@ -46,6 +47,11 @@ namespace Sucrose.Shared.Engine.MpvPlayer.Helper
         {
             try
             {
+                if (SSEHS.IsStill(SSEMPMI.Source))
+                {
+                    return;
+                }
+
                 if (State && SSEMPMI.MediaEngine.Remaining <= TimeSpan.Zero)
                 {
                     SSEMPMI.MediaEngine.Load(SSEMPMI.Source, true);

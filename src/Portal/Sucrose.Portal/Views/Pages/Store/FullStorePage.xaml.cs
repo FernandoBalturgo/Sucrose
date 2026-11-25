@@ -28,6 +28,12 @@ namespace Sucrose.Portal.Views.Pages.Store
 
         private bool Searching;
 
+        private string TypeFilterValue = string.Empty;
+
+        private string SizeFilterValue = string.Empty;
+
+        private bool LoadingFilters;
+
         internal FullStorePage(SSSIS Store)
         {
             this.Store = Store;
@@ -94,6 +100,121 @@ namespace Sucrose.Portal.Views.Pages.Store
             Pagination();
             Category();
             Search();
+
+            LoadTypeFilter();
+            LoadSizeFilter();
+        }
+
+        private void LoadTypeFilter()
+        {
+            LoadingFilters = true;
+
+            TypeFilter.Items.Clear();
+
+            TypeFilter.Items.Add(new ComboBoxItem
+            {
+                Content = SRER.GetValue("Portal", "Category", "All"),
+                Tag = string.Empty
+            });
+
+            if (Store != null && Store.Categories != null)
+            {
+                foreach (string Type in Store.Categories
+                    .SelectMany(Category => Category.Value.Wallpapers.Values)
+                    .Select(Wallpaper => GetType(Wallpaper.Live))
+                    .Distinct()
+                    .OrderBy(Type => Type))
+                {
+                    TypeFilter.Items.Add(new ComboBoxItem
+                    {
+                        Content = Type,
+                        Tag = Type
+                    });
+                }
+            }
+
+            TypeFilter.SelectedIndex = 0;
+
+            LoadingFilters = false;
+        }
+
+        private void LoadSizeFilter()
+        {
+            LoadingFilters = true;
+
+            string Selected = (SizeFilter.SelectedItem as ComboBoxItem)?.Tag as string ?? string.Empty;
+
+            SizeFilter.Items.Clear();
+
+            SizeFilter.Items.Add(new ComboBoxItem
+            {
+                Content = SRER.GetValue("Portal", "Category", "All"),
+                Tag = string.Empty
+            });
+
+            foreach (string Size in SPMI.StoreResolution.Values.Distinct().OrderBy(Size => Size))
+            {
+                SizeFilter.Items.Add(new ComboBoxItem
+                {
+                    Content = Size,
+                    Tag = Size
+                });
+            }
+
+            if (string.IsNullOrEmpty(Selected))
+            {
+                SizeFilter.SelectedIndex = 0;
+            }
+            else
+            {
+                SizeFilter.SelectedItem = SizeFilter.Items
+                    .OfType<ComboBoxItem>()
+                    .FirstOrDefault(Item => (Item.Tag as string) == Selected);
+            }
+
+            LoadingFilters = false;
+        }
+
+        private async void Filter_Changed(object sender, SelectionChangedEventArgs e)
+        {
+            if (LoadingFilters)
+            {
+                return;
+            }
+
+            TypeFilterValue = (TypeFilter.SelectedItem as ComboBoxItem)?.Tag as string ?? string.Empty;
+            SizeFilterValue = (SizeFilter.SelectedItem as ComboBoxItem)?.Tag as string ?? string.Empty;
+
+            Dispose();
+
+            Searching = true;
+
+            ThemePagination.SelectPage = 1;
+
+            await AddThemes(SPMI.SearchService.SearchList, SPMI.SearchService.SearchText, ThemePagination.SelectPage, SPMI.CategoryService.CategoryTag);
+
+            Searching = false;
+        }
+
+        private void SizeFilter_DropDownOpened(object sender, EventArgs e)
+        {
+            LoadSizeFilter();
+        }
+
+        private static string GetType(string Live)
+        {
+            string Extension = Path.GetExtension(Live).TrimStart('.').ToLowerInvariant();
+
+            return Extension switch
+            {
+                "gif" => "GIF",
+                "mp4" or "webm" or "mov" or "mkv" or "avi" => "VIDEO",
+                "html" or "htm" => "WEB",
+                "png" => "PNG",
+                "jpg" or "jpeg" => "JPG",
+                "webp" => "WEBP",
+                _ => Extension.ToUpperInvariant()
+            };
         }
 
         private void Search()
@@ -168,6 +289,21 @@ namespace Sucrose.Portal.Views.Pages.Store
                         {
                             if (!Wallpaper.Adult || (Wallpaper.Adult && SMMP.StoreAdult))
                             {
+                                if (!string.IsNullOrEmpty(TypeFilterValue) && GetType(Wallpaper.Live) != TypeFilterValue)
+                                {
+                                    continue;
+                                }
+
+                                if (!string.IsNullOrEmpty(SizeFilterValue))
+                                {
+                                    string ResolutionKey = $"{Wallpaper.Source}/{WallpaperKey}";
+
+                                    if (SPMI.StoreResolution.TryGetValue(ResolutionKey, out string Resolution) && Resolution != SizeFilterValue)
+                                    {
+                                        continue;
+                                    }
+                                }
+
                                 if (ThemePagination.SelectPage == Page && SPMI.CategoryService.CategoryTag == Tag && SPMI.SearchService.SearchList.Any() && SPMI.SearchService.SearchText == Text)
                                 {
                                     if (SMMP.StorePagination * Page > Count && SMMP.StorePagination * Page <= Count + SMMP.StorePagination)
@@ -203,6 +339,21 @@ namespace Sucrose.Portal.Views.Pages.Store
                             {
                                 if (!Wallpaper.Value.Adult || (Wallpaper.Value.Adult && SMMP.StoreAdult))
                                 {
+                                    if (!string.IsNullOrEmpty(TypeFilterValue) && GetType(Wallpaper.Value.Live) != TypeFilterValue)
+                                    {
+                                        continue;
+                                    }
+
+                                    if (!string.IsNullOrEmpty(SizeFilterValue))
+                                    {
+                                        string ResolutionKey = $"{Wallpaper.Value.Source}/{Wallpaper.Key}";
+
+                                        if (SPMI.StoreResolution.TryGetValue(ResolutionKey, out string Resolution) && Resolution != SizeFilterValue)
+                                        {
+                                            continue;
+                                        }
+                                    }
+
                                     if (ThemePagination.SelectPage == Page && SPMI.CategoryService.CategoryTag == Tag && !SPMI.SearchService.SearchList.Any())
                                     {
                                         if (SMMP.StorePagination * Page > Count && SMMP.StorePagination * Page <= Count + SMMP.StorePagination)
@@ -249,10 +400,27 @@ namespace Sucrose.Portal.Views.Pages.Store
         {
             Dispose();
 
-            ThemeStore.ItemMargin = new Thickness(SMMP.AdaptiveMargin);
-            ThemeStore.MaxItemsPerRow = SMMP.AdaptiveLayout;
+            UpdateLayout();
+
+            SMMP.LayoutChanged += LayoutChangedHandler;
 
             await AddThemes(SPMI.SearchService.SearchList, SPMI.SearchService.SearchText, ThemePagination.SelectPage, SPMI.CategoryService.CategoryTag);
+        }
+
+        private void FullStorePage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            SMMP.LayoutChanged -= LayoutChangedHandler;
+        }
+
+        private void LayoutChangedHandler(object sender, EventArgs e)
+        {
+            UpdateLayout();
+        }
+
+        private void UpdateLayout()
+        {
+            ThemeStore.ItemMargin = new Thickness(SMMP.AdaptiveMargin);
+            ThemeStore.MaxItemsPerRow = Math.Max(1, SMMP.AdaptiveLayout);
         }
 
         private async void SearchService_SearchTextChanged(object sender, EventArgs e)

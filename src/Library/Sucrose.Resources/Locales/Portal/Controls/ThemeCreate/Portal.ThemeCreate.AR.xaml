@@ -53,7 +53,7 @@
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Delete">تراجع</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Title">تحديد ملف Gif</system:String>
-    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">ملفّات Gif (*.gif)|*.gif</system:String>
+    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">ملفّات Gif (*.gif, *.png, *.jpg, *.jpeg, *.bmp)|*.gif;*.png;*.jpg;*.jpeg;*.bmp</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Title">تحديد ملف فيديو</system:String>
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Filter">ملفّات الفيديو (*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4)|*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4</system:String>

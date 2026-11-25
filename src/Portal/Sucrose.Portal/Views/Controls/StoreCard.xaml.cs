@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Wpf.Ui.Controls;
 using SHG = Skylark.Helper.Generator;
 using SHV = Skylark.Helper.Versionly;
@@ -61,17 +62,11 @@ namespace Sucrose.Portal.Views.Controls
     /// </summary>
     public partial class StoreCard : UserControl, IDisposable
     {
-        private readonly PropertyChangedEventHandler InfoChangedHandler;
         private readonly KeyValuePair<string, SSSIW> Wallpaper = new();
-        private readonly object SubscribeLock = new();
         private readonly string Theme = string.Empty;
         private readonly SPEIL Loader = new();
-        private string Keys = string.Empty;
         private readonly string Guid;
-        private bool Subscribed;
-        private bool State;
         private SSTHI Info;
-        private bool Error;
 
         internal StoreCard(string Theme, KeyValuePair<string, SSSIW> Wallpaper)
         {
@@ -79,188 +74,7 @@ namespace Sucrose.Portal.Views.Controls
             this.Wallpaper = Wallpaper;
             Guid = Path.Combine(Wallpaper.Value.Source, Wallpaper.Key);
 
-            InfoChangedHandler = (s, e) => StoreService_InfoChanged(Keys);
-
             InitializeComponent();
-        }
-
-        private async void Start()
-        {
-            if (Info != null && Info.AppVersion.CompareTo(SHV.Entry()) <= 0)
-            {
-                if (DownloadSymbol.Symbol == SymbolRegular.CloudArrowDown24)
-                {
-                    if (await SSSHN.GetHostEntryAsync())
-                    {
-                        State = true;
-                        Error = false;
-
-                        DownloadSymbol.Symbol = SymbolRegular.Empty;
-
-                        DownloadRing.Visibility = Visibility.Visible;
-                        DownloadSymbol.Visibility = Visibility.Collapsed;
-
-                        await Task.Run(SendDownload);
-
-                        await Task.Run(DownloadTheme);
-                    }
-                    else
-                    {
-                        DownloadSymbol.Foreground = SRER.GetResource<Brush>("PaletteRedBrush");
-                        DownloadSymbol.Symbol = SymbolRegular.CloudDismiss24;
-
-                        await Task.Delay(3000);
-
-                        DownloadSymbol.Foreground = SRER.GetResource<Brush>("TextFillColorPrimaryBrush");
-                        DownloadSymbol.Symbol = SymbolRegular.CloudArrowDown24;
-                    }
-                }
-            }
-            else if (Info != null)
-            {
-                DownloadSymbol.Visibility = Visibility.Hidden;
-                IncompatibleVersion.Visibility = Visibility.Visible;
-
-                if (!SSSHP.Work(SSSMI.Update))
-                {
-                    SSSHP.Run(SSSMI.Commandog, $"{SMMRG.StartCommand}{SSDECT.Update}{SMMRG.ValueSeparator}{SSSMI.Update}");
-                }
-            }
-        }
-
-        private async void Subscribe()
-        {
-            lock (SubscribeLock)
-            {
-                if (!Subscribed)
-                {
-                    Subscribed = true;
-
-                    SSSTMI.StoreService.InfoChanged += InfoChangedHandler;
-                }
-            }
-        }
-
-        private async void Unsubscribe()
-        {
-            lock (SubscribeLock)
-            {
-                if (Subscribed)
-                {
-                    Subscribed = false;
-
-                    SSSTMI.StoreService.InfoChanged -= InfoChangedHandler;
-                }
-            }
-        }
-
-        private async void SendDownload()
-        {
-            try
-            {
-                if (false && SMMG.TelemetryData)
-                {
-                    SSSMDTD DownloadData = new()
-                    {
-                        AppVersion = SSCHV.GetText(),
-                        WallpaperTitle = Wallpaper.Key,
-                        WallpaperVersion = $"{Info.Version}",
-                        WallpaperAppVersion = $"{Info.AppVersion}",
-                        WallpaperLocation = $"{Wallpaper.Value.Source.Split('/').LastOrDefault()}/{Wallpaper.Key}"
-                    };
-
-                    StringContent Content = new(JsonConvert.SerializeObject(DownloadData, Formatting.Indented), SMMRS.Encoding, SMMRS.ApplicationJson);
-
-                    HttpResponseMessage Response = await SSDMI.Client.PostAsync($"{SMMRU.Soferity}/{SMMRS.Version}/{SMMRS.Telemetry}/{SMMRS.Download}/{SSSHU.GetGuid()}", Content);
-
-                    Response.EnsureSuccessStatusCode();
-                }
-            }
-            catch (Exception Exception)
-            {
-                await SSWEW.Watch_CatchException(Exception);
-            }
-        }
-
-        private async void DownloadTheme()
-        {
-            try
-            {
-                do
-                {
-                    Keys = SHG.GenerateString(SMMVA.Chars, 25, SMMRG.Randomise);
-                } while (Directory.Exists(Path.Combine(SMML.Location, Keys)));
-
-                Subscribe();
-
-                string LibraryPath = Path.Combine(SMML.Location, Keys);
-                string TemporaryPath = Path.Combine(SMMRP.ApplicationData, SMMRG.AppName, SMMRF.Cache, SMMRF.Store, SMMRF.Temporary, Keys);
-
-                switch (SSDMMP.StoreServerType)
-                {
-                    case SSDESST.GitHub:
-                        await SSSHGHD.Theme(Path.Combine(Wallpaper.Value.Source, Wallpaper.Key), TemporaryPath, Guid, Keys);
-                        break;
-                    default:
-                        await SSSHSD.Theme(Path.Combine(Wallpaper.Value.Source, Wallpaper.Key), TemporaryPath, Guid, Keys, Wallpaper.Value.Size);
-                        break;
-                }
-
-                await Task.Delay(100);
-
-                if (Directory.Exists(TemporaryPath))
-                {
-                    SSSHC.Folder(TemporaryPath, LibraryPath);
-
-                    SSSHF.WriteStream(Path.Combine(LibraryPath, SMMRC.SucroseStore), string.Empty);
-
-                    if ((!SMMB.ClosePerformance && !SMMB.PausePerformance) || !SSSHP.Work(SSSMI.Backgroundog))
-                    {
-                        if (SMME.StoreStart)
-                        {
-                            SMMI.LibrarySettingManager.SetSetting(SMMCL.Selected, Path.GetFileName(Keys));
-
-                            if (SSSHL.Run())
-                            {
-                                SSLHK.Stop();
-                            }
-
-                            SSLHR.Start();
-                        }
-                    }
-                }
-            }
-            catch (Exception Exception)
-            {
-                Error = true;
-
-                await SSWEW.Watch_CatchException(Exception);
-
-                await Application.Current.Dispatcher.InvokeAsync(async () =>
-                {
-                    if (!string.IsNullOrEmpty(Keys) && SSSTMI.StoreService.Info.ContainsKey(Keys))
-                    {
-                        SSSTMI.StoreService.Info.Remove(Keys);
-                    }
-
-                    State = false;
-
-                    Unsubscribe();
-
-                    Download.ToolTip = null;
-
-                    DownloadRing.Visibility = Visibility.Collapsed;
-                    DownloadSymbol.Visibility = Visibility.Visible;
-
-                    DownloadSymbol.Foreground = SRER.GetResource<Brush>("PaletteRedBrush");
-                    DownloadSymbol.Symbol = SymbolRegular.CloudOff24;
-
-                    await Task.Delay(3000);
-
-                    DownloadSymbol.Foreground = SRER.GetResource<Brush>("TextFillColorPrimaryBrush");
-                    DownloadSymbol.Symbol = SymbolRegular.CloudArrowDown24;
-                });
-            }
         }
 
         private async Task<bool> DownloadCache()
@@ -304,181 +118,6 @@ namespace Sucrose.Portal.Views.Controls
             }
         }
 
-        private async void StoreService_InfoChanged(string Keys)
-        {
-            if (this.Keys == Keys && SSSTMI.StoreService.Info.TryGetValue(Keys, out SSSID Key))
-            {
-                await Application.Current.Dispatcher.InvokeAsync(async () =>
-                {
-                    DownloadRing.Progress = Key.ProgressPercentage;
-
-                    ToolTip RingTip = new()
-                    {
-                        Content = Key.Percentage
-                    };
-
-                    Download.ToolTip = RingTip;
-
-                    if (Key.ProgressPercentage >= 100)
-                    {
-                        if (State)
-                        {
-                            State = false;
-
-                            await Task.Delay(1500);
-
-                            if (!Error)
-                            {
-                                Unsubscribe();
-
-                                Download.ToolTip = null;
-                                DownloadRing.Visibility = Visibility.Collapsed;
-                                DownloadSymbol.Visibility = Visibility.Visible;
-
-                                DownloadSymbol.Foreground = SRER.GetResource<Brush>("SystemFillColorSuccessBrush");
-                                DownloadSymbol.Symbol = SymbolRegular.CloudCheckmark24;
-
-                                await Task.Delay(3000);
-
-                                DownloadSymbol.Foreground = SRER.GetResource<Brush>("TextFillColorPrimaryBrush");
-                                DownloadSymbol.Symbol = SymbolRegular.CloudArrowDown24;
-
-                                if (SSSTMI.StoreService.Info.ContainsKey(Keys))
-                                {
-                                    SSSTMI.StoreService.Info.Remove(Keys);
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        private void Download_Click(object sender, RoutedEventArgs e)
-        {
-            Start();
-        }
-
-        private void MenuUpdate_Click(object sender, RoutedEventArgs e)
-        {
-            if (!SSSHP.Work(SSSMI.Update))
-            {
-                SSSHP.Run(SSSMI.Commandog, $"{SMMRG.StartCommand}{SSDECT.Update}{SMMRG.ValueSeparator}{SSSMI.Update}");
-            }
-        }
-
-        private void MenuInstall_Click(object sender, RoutedEventArgs e)
-        {
-            Start();
-        }
-
-        private void ContextMenu_Opened(object sender, RoutedEventArgs e)
-        {
-            MenuInstall.Header = SRER.GetValue("Portal", "StoreCard", "MenuInstall");
-
-            if (Info != null)
-            {
-                MenuReport.IsEnabled = true;
-            }
-            else
-            {
-                MenuReport.IsEnabled = false;
-            }
-
-            if (DownloadSymbol.Symbol == SymbolRegular.CloudArrowDown24 && Info != null && Info.AppVersion.CompareTo(SHV.Entry()) <= 0)
-            {
-                MenuInstall.IsEnabled = true;
-
-                MenuUpdate.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                MenuInstall.IsEnabled = false;
-
-                if (Info != null && Info.AppVersion.CompareTo(SHV.Entry()) > 0)
-                {
-                    MenuUpdate.Visibility = Visibility.Visible;
-
-                    if (SSSHP.Work(SSSMI.Update))
-                    {
-                        MenuUpdate.IsEnabled = false;
-
-                        MenuUpdate.Header = SRER.GetValue("Portal", "StoreCard", "MenuUpdating");
-                    }
-                    else
-                    {
-                        MenuUpdate.IsEnabled = true;
-
-                        MenuUpdate.Header = SRER.GetValue("Portal", "StoreCard", "MenuUpdate");
-                    }
-
-                    MenuInstall.Header += $" ({SRER.GetValue("Portal", "StoreCard", "Incompatible")})";
-                }
-            }
-        }
-
-        private void StoreCard_Unloaded(object sender, RoutedEventArgs e)
-        {
-            Unsubscribe();
-        }
-
-        private void StoreCard_MouseEnter(object sender, MouseEventArgs e)
-        {
-            if (Info != null && SMMP.StorePreview)
-            {
-                string GifPath = $"{SSSHS.Source(SSDMMP.StoreServerType)}/{Wallpaper.Value.Source}/{Wallpaper.Key}/{Wallpaper.Value.Live}";
-
-                SXAGAB.SetSourceUri(Imaginer, new(GifPath));
-                SXAGAB.AddLoadedHandler(Imaginer, Imaginer_MediaOpened);
-            }
-        }
-
-        private void StoreCard_MouseLeave(object sender, MouseEventArgs e)
-        {
-            if (Info != null && SMMP.StorePreview)
-            {
-                Imaginer.Source = null;
-                SXAGAB.SetSourceUri(Imaginer, null);
-
-                Imagine.Visibility = Visibility.Visible;
-                Imaginer.Visibility = Visibility.Hidden;
-
-                if (SMMP.StorePreviewHide)
-                {
-                    Preview.Visibility = Visibility.Visible;
-                }
-
-                Dispose();
-            }
-        }
-
-        private void Imaginer_MediaOpened(object sender, RoutedEventArgs e)
-        {
-            Imaginer.Visibility = Visibility.Visible;
-            Imagine.Visibility = Visibility.Hidden;
-
-            if (SMMP.StorePreviewHide)
-            {
-                Preview.Visibility = Visibility.Hidden;
-            }
-
-            Dispose();
-        }
-
-        private async void MenuReport_Click(object sender, RoutedEventArgs e)
-        {
-            SPVCTR ThemeReport = new()
-            {
-                Info = Info,
-                Theme = Theme,
-                Wallpaper = Wallpaper
-            };
-
-            await ThemeReport.ShowAsync();
-
-            ThemeReport.Dispose();
-        }
-
         private async void StoreCard_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -487,24 +126,6 @@ namespace Sucrose.Portal.Views.Controls
 
                 if (Result)
                 {
-                    (ThemeTitle.Text, ThemeDescription.Text) = SSTCLC.Convert(Info);
-
-                    ToolTip TitleTip = new()
-                    {
-                        Content = ThemeTitle.Text
-                    };
-
-                    ToolTip DescriptionTip = new()
-                    {
-                        Content = ThemeDescription.Text
-                    };
-
-                    ThemeTitle.ToolTip = TitleTip;
-                    ThemeDescription.ToolTip = DescriptionTip;
-
-                    ThemeTitle.FlowDirection = SRHR.IsRightToLeftText(ThemeTitle.Text) ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
-                    ThemeDescription.FlowDirection = SRHR.IsRightToLeftText(ThemeDescription.Text) ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
-
                     string ImagePath = Path.Combine(Theme, Info.Thumbnail);
 
                     if (File.Exists(ImagePath))
@@ -519,28 +140,21 @@ namespace Sucrose.Portal.Views.Controls
                         }
                     }
 
-                    if (Info.AppVersion.CompareTo(SHV.Entry()) > 0)
+                    ThemeType.Text = GetType(Wallpaper.Value.Live);
+
+                    string ResolutionKey = $"{Wallpaper.Value.Source}/{Wallpaper.Key}";
+
+                    (int Width, int Height) = GetImageSize(ImagePath);
+
+                    if (Width > 0 && Height > 0)
                     {
-                        DownloadSymbol.Visibility = Visibility.Hidden;
-                        IncompatibleVersion.Visibility = Visibility.Visible;
+                        ThemeSize.Text = $"{Width}x{Height}";
+
+                        SPMI.StoreResolution[ResolutionKey] = ThemeSize.Text;
                     }
-
-                    KeyValuePair<string, SSSID> Matching = SSSTMI.StoreService.Info.FirstOrDefault(Pair => Pair.Value.Guid == Guid && Pair.Value.ProgressPercentage < 100);
-
-                    if (!Matching.Equals(default(KeyValuePair<string, SSSID>)))
+                    else
                     {
-                        Keys = Matching.Key;
-
-                        State = true;
-
-                        Subscribe();
-
-                        StoreService_InfoChanged(Keys);
-
-                        DownloadSymbol.Symbol = SymbolRegular.Empty;
-
-                        DownloadRing.Visibility = Visibility.Visible;
-                        DownloadSymbol.Visibility = Visibility.Collapsed;
+                        ThemeSize.Text = FormatSize(Wallpaper.Value.Size);
                     }
 
                     await Task.Delay(100);
@@ -567,9 +181,224 @@ namespace Sucrose.Portal.Views.Controls
             }
         }
 
+        private void StoreCard_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (Info != null && SMMP.StorePreview)
+            {
+                string GifPath = $"{SSSHS.Source(SSDMMP.StoreServerType)}/{Wallpaper.Value.Source}/{Wallpaper.Key}/{Wallpaper.Value.Live}";
+
+                SXAGAB.SetSourceUri(Imaginer, new(GifPath));
+                SXAGAB.AddLoadedHandler(Imaginer, Imaginer_MediaOpened);
+            }
+        }
+
+        private void StoreCard_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (Info != null && SMMP.StorePreview)
+            {
+                Imaginer.Source = null;
+                SXAGAB.SetSourceUri(Imaginer, null);
+
+                Imagine.Visibility = Visibility.Visible;
+                Imaginer.Visibility = Visibility.Hidden;
+
+                Dispose();
+            }
+        }
+
+        private void Imaginer_MediaOpened(object sender, RoutedEventArgs e)
+        {
+            Imaginer.Visibility = Visibility.Visible;
+            Imagine.Visibility = Visibility.Hidden;
+
+            Dispose();
+        }
+
         private void StoreCard_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            Start();
+            OpenPreview();
+        }
+
+        private async void OpenPreview()
+        {
+            if (Info == null)
+            {
+                return;
+            }
+
+            StorePreview Preview = new(Theme, Wallpaper, Info, Guid);
+
+            await Preview.ShowAsync();
+
+            Preview.Dispose();
+        }
+
+        private void MenuUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            if (!SSSHP.Work(SSSMI.Update))
+            {
+                SSSHP.Run(SSSMI.Commandog, $"{SMMRG.StartCommand}{SSDECT.Update}{SMMRG.ValueSeparator}{SSSMI.Update}");
+            }
+        }
+
+        private void MenuInstall_Click(object sender, RoutedEventArgs e)
+        {
+            OpenPreview();
+        }
+
+        private void ContextMenu_Opened(object sender, RoutedEventArgs e)
+        {
+            MenuInstall.Header = SRER.GetValue("Portal", "StoreCard", "MenuInstall");
+
+            MenuReport.IsEnabled = Info != null;
+
+            bool Compatible = Info != null && Info.AppVersion.CompareTo(SHV.Entry()) <= 0;
+
+            MenuInstall.IsEnabled = Compatible;
+
+            if (Info != null && Info.AppVersion.CompareTo(SHV.Entry()) > 0)
+            {
+                MenuUpdate.Visibility = Visibility.Visible;
+
+                if (SSSHP.Work(SSSMI.Update))
+                {
+                    MenuUpdate.IsEnabled = false;
+
+                    MenuUpdate.Header = SRER.GetValue("Portal", "StoreCard", "MenuUpdating");
+                }
+                else
+                {
+                    MenuUpdate.IsEnabled = true;
+
+                    MenuUpdate.Header = SRER.GetValue("Portal", "StoreCard", "MenuUpdate");
+                }
+
+                MenuInstall.Header += $" ({SRER.GetValue("Portal", "StoreCard", "Incompatible")})";
+            }
+            else
+            {
+                MenuUpdate.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void MenuReport_Click(object sender, RoutedEventArgs e)
+        {
+            SPVCTR ThemeReport = new()
+            {
+                Info = Info,
+                Theme = Theme,
+                Wallpaper = Wallpaper
+            };
+
+            await ThemeReport.ShowAsync();
+
+            ThemeReport.Dispose();
+        }
+
+        private static (int Width, int Height) GetImageSize(string ImagePath)
+        {
+            try
+            {
+                using FileStream Stream = new(ImagePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                byte[] Buffer = new byte[64 * 1024];
+
+                int Read = Stream.Read(Buffer, 0, Buffer.Length);
+
+                if (Read >= 24 && Buffer[0] == 0x89 && Buffer[1] == 0x50 && Buffer[2] == 0x4E && Buffer[3] == 0x47)
+                {
+                    int Width = (Buffer[16] << 24) | (Buffer[17] << 16) | (Buffer[18] << 8) | Buffer[19];
+                    int Height = (Buffer[20] << 24) | (Buffer[21] << 16) | (Buffer[22] << 8) | Buffer[23];
+
+                    return (Width, Height);
+                }
+
+                if (Read >= 10 && Buffer[0] == 0x47 && Buffer[1] == 0x49 && Buffer[2] == 0x46)
+                {
+                    int Width = Buffer[6] | (Buffer[7] << 8);
+                    int Height = Buffer[8] | (Buffer[9] << 8);
+
+                    return (Width, Height);
+                }
+
+                if (Read >= 4 && Buffer[0] == 0xFF && Buffer[1] == 0xD8)
+                {
+                    int Offset = 2;
+
+                    while (Offset + 9 < Read)
+                    {
+                        if (Buffer[Offset] != 0xFF)
+                        {
+                            Offset++;
+                            continue;
+                        }
+
+                        byte Marker = Buffer[Offset + 1];
+
+                        if (Marker == 0xD8 || Marker == 0xD9)
+                        {
+                            Offset += 2;
+                            continue;
+                        }
+
+                        int Length = (Buffer[Offset + 2] << 8) | Buffer[Offset + 3];
+
+                        if (Marker >= 0xC0 && Marker <= 0xCF && Marker != 0xC4 && Marker != 0xC8 && Marker != 0xCC)
+                        {
+                            int Height = (Buffer[Offset + 5] << 8) | Buffer[Offset + 6];
+                            int Width = (Buffer[Offset + 7] << 8) | Buffer[Offset + 8];
+
+                            return (Width, Height);
+                        }
+
+                        Offset += 2 + Length;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return (0, 0);
+        }
+
+        private static string GetType(string Live)
+        {
+            string Extension = Path.GetExtension(Live).TrimStart('.').ToLowerInvariant();
+
+            return Extension switch
+            {
+                "gif" => "GIF",
+                "mp4" or "webm" or "mov" or "mkv" or "avi" => "VIDEO",
+                "html" or "htm" => "WEB",
+                "png" => "PNG",
+                "jpg" or "jpeg" => "JPG",
+                "webp" => "WEBP",
+                _ => Extension.ToUpperInvariant()
+            };
+        }
+
+        private static string FormatSize(long Bytes)
+        {
+            if (Bytes <= 0)
+            {
+                return string.Empty;
+            }
+
+            string[] Units = ["B", "KB", "MB", "GB"];
+
+            double Size = Bytes;
+
+            int Unit = 0;
+
+            while (Size >= 1024 && Unit < Units.Length - 1)
+            {
+                Size /= 1024;
+
+                Unit++;
+            }
+
+            return $"{Size:0.#} {Units[Unit]}";
         }
 
         public void Dispose()

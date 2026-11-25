@@ -53,7 +53,7 @@
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Delete">元に戻す</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Title">Gif ファイルを選択</system:String>
-    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Gif ファイル (*.gif)|*.gif</system:String>
+    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Gif ファイル (*.gif, *.png, *.jpg, *.jpeg, *.bmp)|*.gif;*.png;*.jpg;*.jpeg;*.bmp</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Title">ビデオファイルを選択</system:String>
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Filter">ビデオファイル (*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4)|*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4</system:String>

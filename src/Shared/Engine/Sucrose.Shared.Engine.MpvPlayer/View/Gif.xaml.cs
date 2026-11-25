@@ -41,6 +41,12 @@ namespace Sucrose.Shared.Engine.MpvPlayer.View
 
             SSEMPMI.MediaEngine.LoadConfig(SSEMPMI.MpvConfig);
 
+            if (SSEHS.IsStill(SSEMPMI.Source))
+            {
+                // Show a still picture forever instead of ending after a second.
+                SSEMPMI.MediaEngine.API.SetPropertyString("image-display-duration", "inf");
+            }
+
             SSEMPMI.MediaEngine.Load(SSEMPMI.Source);
 
             SSEMI.GeneralTimer.Tick += new EventHandler(GeneralTimer_Tick);

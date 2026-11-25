@@ -53,7 +53,7 @@
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Delete">Cofnij</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Title">Wybierz Plik Gif</system:String>
-    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Pliki Gif (*.gif)|*.gif</system:String>
+    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Pliki Gif (*.gif, *.png, *.jpg, *.jpeg, *.bmp)|*.gif;*.png;*.jpg;*.jpeg;*.bmp</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Title">Wybierz Plik Wideo</system:String>
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Filter">Pliki Wideo (*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4)|*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4</system:String>

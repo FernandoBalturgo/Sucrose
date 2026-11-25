@@ -53,7 +53,7 @@
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Delete">Скасувати</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Title">Виберіть Файл Gif</system:String>
-    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Файли Gif (*.gif)|*.gif</system:String>
+    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">Файли Gif (*.gif, *.png, *.jpg, *.jpeg, *.bmp)|*.gif;*.png;*.jpg;*.jpeg;*.bmp</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Title">Виберіть Відеофайл</system:String>
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Filter">Відеофайли (*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4)|*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4</system:String>

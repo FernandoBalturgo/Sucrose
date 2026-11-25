@@ -59,6 +59,14 @@
 .EXAMPLE
     .\Sucrose.ps1 -SelfContained "true" -CompressPackage "false"
     Builds self-contained without compression
+
+.EXAMPLE
+    .\Sucrose.ps1 -Fast
+    Fast dev build: parallel publish, no runtime install, no compression, no retries
+
+.EXAMPLE
+    .\Sucrose.ps1 -Parallel:$false
+    Sequential publish (original behaviour; use if parallel publishing misbehaves)
 #>
 
 [CmdletBinding()]
@@ -108,7 +116,17 @@ param (
     [string]$CompressPackage = "true",
 
     [Parameter(HelpMessage = ".NET version to install")]
-    [string]$DotNetVersion = "11.0.100"
+    [string]$DotNetVersion = "11.0.100",
+
+    [Parameter(HelpMessage = "Fast dev mode: skip runtime install, compression and retries")]
+    [switch]$Fast,
+
+    [Parameter(HelpMessage = "Publish projects in parallel (build once, then publish --no-build)")]
+    [bool]$Parallel = $true,
+
+    [Parameter(HelpMessage = "Maximum number of concurrent publishes when -Parallel is set")]
+    [ValidateRange(1, 16)]
+    [int]$MaxParallelism = 4
 )
 
 #region Initialization
@@ -167,30 +185,40 @@ if (-not $RuntimeIdentifier) {
 }
 Write-Host "$(Get-Date -Format 'HH:mm:ss') [CONFIG] RuntimeIdentifier: $RuntimeIdentifier" -ForegroundColor Cyan
 
+# Fast dev mode: strip the slow extras (runtime download, max-compression, retries)
+if ($Fast) {
+    $InstallRuntime = "false"
+    $CompressPackage = "false"
+    $MaxAttempts = 1
+    Write-Host "$(Get-Date -Format 'HH:mm:ss') [CONFIG] Fast mode: runtime install/compression/retries disabled" -ForegroundColor Cyan
+}
+
 #endregion
 
 #region Project Configuration
 
 # Define all projects to publish
+# Disabled projects are kept here (commented) so they can be re-enabled later without
+# re-adding them: alt engines (Nebula/Vexana/VlcPlayer/WebView/Xavier), Reportdog, Undo, Update.
 $script:Projects = @(
     "..\src\Launcher\Sucrose.Launcher\Sucrose.Launcher.csproj",
     "..\src\Live\Sucrose.Live.Aurora\Sucrose.Live.Aurora.csproj",
     "..\src\Live\Sucrose.Live.CefSharp\Sucrose.Live.CefSharp.csproj",
     "..\src\Live\Sucrose.Live.MpvPlayer\Sucrose.Live.MpvPlayer.csproj",
-    "..\src\Live\Sucrose.Live.Nebula\Sucrose.Live.Nebula.csproj",
-    "..\src\Live\Sucrose.Live.Vexana\Sucrose.Live.Vexana.csproj",
-    "..\src\Live\Sucrose.Live.VlcPlayer\Sucrose.Live.VlcPlayer.csproj",
-    "..\src\Live\Sucrose.Live.WebView\Sucrose.Live.WebView.csproj",
-    "..\src\Live\Sucrose.Live.Xavier\Sucrose.Live.Xavier.csproj",
+    #"..\src\Live\Sucrose.Live.Nebula\Sucrose.Live.Nebula.csproj",
+    #"..\src\Live\Sucrose.Live.Vexana\Sucrose.Live.Vexana.csproj",
+    #"..\src\Live\Sucrose.Live.VlcPlayer\Sucrose.Live.VlcPlayer.csproj",
+    #"..\src\Live\Sucrose.Live.WebView\Sucrose.Live.WebView.csproj",
+    #"..\src\Live\Sucrose.Live.Xavier\Sucrose.Live.Xavier.csproj",
     "..\src\Localizer\Sucrose.Localizer\Sucrose.Localizer.csproj",
     "..\src\Portal\Sucrose.Portal\Sucrose.Portal.csproj",
     "..\src\Project\Sucrose.Backgroundog\Sucrose.Backgroundog.csproj",
     "..\src\Project\Sucrose.Commandog\Sucrose.Commandog.csproj",
     "..\src\Project\Sucrose.Property\Sucrose.Property.csproj",
-    "..\src\Project\Sucrose.Reportdog\Sucrose.Reportdog.csproj",
-    "..\src\Project\Sucrose.Undo\Sucrose.Undo.csproj",
-    "..\src\Project\Sucrose.Watchdog\Sucrose.Watchdog.csproj",
-    "..\src\Update\Sucrose.Update\Sucrose.Update.csproj"
+    #"..\src\Project\Sucrose.Reportdog\Sucrose.Reportdog.csproj",
+    #"..\src\Project\Sucrose.Undo\Sucrose.Undo.csproj",
+    "..\src\Project\Sucrose.Watchdog\Sucrose.Watchdog.csproj"
+    #"..\src\Update\Sucrose.Update\Sucrose.Update.csproj"
 )
 
 # Auto-detect TargetFramework from first project if not specified
@@ -353,6 +381,75 @@ function Publish-SucroseProject {
 
     if (-not $success) {
         throw "Failed to publish $ProjectName after $MaxAttempts attempts. See log: $logFile"
+    }
+}
+
+function New-PublishSpec {
+    <#
+    .SYNOPSIS
+        Prepares (cleans destination, builds argument list) a no-build publish for parallel mode.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ProjectPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ProjectName
+    )
+
+    $destination = Join-Path $PublishBaseDir $PublishDir
+    $destination = Join-Path $destination "$TargetFramework\$PlatformTarget\$ProjectName"
+
+    if (Test-Path $destination) {
+        Remove-Item -Path $destination -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    New-Item -ItemType Directory -Path $destination -Force | Out-Null
+
+    $logFile = Join-Path $destination "Publish.log"
+
+    $publishArgs = @(
+        "publish",
+        $ProjectPath,
+        "-c", $Configuration,
+        "/p:PlatformTarget=$PlatformTarget",
+        "-r", $RuntimeIdentifier,
+        "-f", $TargetFramework,
+        "--self-contained", $SelfContained,
+        "--no-build",
+        "-o", $destination,
+        "--nologo",
+        "--verbosity", "minimal"
+    )
+
+    return [pscustomobject]@{
+        Name = $ProjectName
+        Args = $publishArgs
+        Dest = $destination
+        Log  = $logFile
+    }
+}
+
+function Wait-ParallelPublish {
+    <#
+    .SYNOPSIS
+        Waits for a batch of Start-Process publish jobs, checks exit codes, runs CefSharp post-config.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [object[]]$Jobs
+    )
+
+    foreach ($job in $Jobs) {
+        $job.Proc.WaitForExit()
+        if ($job.Proc.ExitCode -is [int] -and $job.Proc.ExitCode -ne 0) {
+            throw "Publish failed for $($job.Spec.Name) (exit code: $($job.Proc.ExitCode)). See log: $($job.Spec.Log)"
+        }
+        Write-StatusMessage "Successfully published $($job.Spec.Name)" -Type "Success"
+        if ($job.Spec.Name -eq "Sucrose.Live.CefSharp") {
+            Configure-CefSharpSubprocess -OutputPath $job.Spec.Dest
+        }
     }
 }
 
@@ -641,23 +738,86 @@ try {
 
     # Publish all projects
     Write-StatusMessage "Starting project publishing..." -Type "Info"
-    
+
     $projectCount = $script:Projects.Count
-    $currentProject = 0
 
-    foreach ($proj in $script:Projects) {
-        $currentProject++
-        $projName = [System.IO.Path]::GetFileNameWithoutExtension($proj)
-        $fullPath = Join-Path $PublishBaseDir $proj
+    if ($Parallel) {
+        # Parallel mode: build everything once (shared dependencies compile a single
+        # time), then publish each project with --no-build concurrently. This avoids
+        # the file-lock contention that parallel full publishes would cause on the
+        # shared library outputs.
+        Write-StatusMessage "Parallel mode: pre-building solution (max $MaxParallelism concurrent publishes)..." -Type "Info"
 
-        Write-Host "`n--- Project $currentProject of $projectCount ---" -ForegroundColor Magenta
-        
-        if (-not (Test-Path $fullPath)) {
-            Write-StatusMessage "Project not found: $fullPath" -Type "Error"
-            throw "Project file not found: $fullPath"
+        $solutionPath = Join-Path $PublishBaseDir "..\src\Sucrose.slnx"
+        $localizerPath = Join-Path $PublishBaseDir "..\src\Localizer\Sucrose.Localizer\Sucrose.Localizer.csproj"
+
+        $packageRoot = Join-Path $PublishBaseDir $PublishDir
+        New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
+
+        $preBuildArgs = @(
+            "build", $solutionPath,
+            "-c", $Configuration,
+            "/p:PlatformTarget=$PlatformTarget",
+            "--nologo", "--verbosity", "minimal"
+        )
+        & dotnet @preBuildArgs *>&1 | Tee-Object -FilePath (Join-Path $packageRoot "prebuild-solution.log")
+        if ($LASTEXITCODE -ne 0) { throw "Pre-build of solution failed (exit code: $LASTEXITCODE)" }
+
+        if (Test-Path $localizerPath) {
+            $localizerArgs = @(
+                "build", $localizerPath,
+                "-c", $Configuration,
+                "/p:PlatformTarget=$PlatformTarget",
+                "--nologo", "--verbosity", "minimal"
+            )
+            & dotnet @localizerArgs *>&1 | Tee-Object -FilePath (Join-Path $packageRoot "prebuild-localizer.log")
+            if ($LASTEXITCODE -ne 0) { throw "Pre-build of Localizer failed (exit code: $LASTEXITCODE)" }
         }
 
-        Publish-SucroseProject -ProjectPath $fullPath -ProjectName $projName
+        $pending = @()
+        foreach ($proj in $script:Projects) {
+            $projName = [System.IO.Path]::GetFileNameWithoutExtension($proj)
+            $fullPath = Join-Path $PublishBaseDir $proj
+
+            if (-not (Test-Path $fullPath)) {
+                Write-StatusMessage "Project not found: $fullPath" -Type "Error"
+                throw "Project file not found: $fullPath"
+            }
+
+            Write-Host "$(Get-Date -Format 'HH:mm:ss') [PUBLISH] $projName" -ForegroundColor Gray
+            $spec = New-PublishSpec -ProjectPath $fullPath -ProjectName $projName
+
+            $proc = Start-Process -FilePath "dotnet" -ArgumentList $spec.Args -NoNewWindow -PassThru `
+                -RedirectStandardOutput $spec.Log -RedirectStandardError "$($spec.Log).err"
+
+            $pending += [pscustomobject]@{ Proc = $proc; Spec = $spec }
+
+            if ($pending.Count -ge $MaxParallelism) {
+                Wait-ParallelPublish -Jobs $pending
+                $pending = @()
+            }
+        }
+
+        if ($pending.Count -gt 0) {
+            Wait-ParallelPublish -Jobs $pending
+        }
+    }
+    else {
+        $currentProject = 0
+        foreach ($proj in $script:Projects) {
+            $currentProject++
+            $projName = [System.IO.Path]::GetFileNameWithoutExtension($proj)
+            $fullPath = Join-Path $PublishBaseDir $proj
+
+            Write-Host "`n--- Project $currentProject of $projectCount ---" -ForegroundColor Magenta
+
+            if (-not (Test-Path $fullPath)) {
+                Write-StatusMessage "Project not found: $fullPath" -Type "Error"
+                throw "Project file not found: $fullPath"
+            }
+
+            Publish-SucroseProject -ProjectPath $fullPath -ProjectName $projName
+        }
     }
 
     Write-Host "`n" -NoNewline

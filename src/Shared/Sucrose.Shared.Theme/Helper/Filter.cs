@@ -22,13 +22,27 @@ namespace Sucrose.Shared.Theme.Helper
             }
         }
 
+        public static bool StillExtension(string File)
+        {
+            try
+            {
+                string Extension = Path.GetExtension(File.Split('?')[0]).Replace(".", "");
+
+                return Extension.Equals("PNG", StringComparison.OrdinalIgnoreCase) || Extension.Equals("JPG", StringComparison.OrdinalIgnoreCase) || Extension.Equals("JPEG", StringComparison.OrdinalIgnoreCase) || Extension.Equals("BMP", StringComparison.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static bool GifExtension(string File)
         {
             try
             {
                 string Extension = Path.GetExtension(File).Replace(".", "");
 
-                return Extension.Equals("GIF", StringComparison.OrdinalIgnoreCase);
+                return Extension.Equals("GIF", StringComparison.OrdinalIgnoreCase) || StillExtension(File);
             }
             catch
             {

@@ -53,7 +53,7 @@
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Delete">לְבַטֵל</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Title">בחר קובץ Gif</system:String>
-    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">קבצי Gif (*.gif)|*.gif</system:String>
+    <system:String x:Key="Portal.ThemeCreate.DragDrop.Gif.Filter">קבצי Gif (*.gif, *.png, *.jpg, *.jpeg, *.bmp)|*.gif;*.png;*.jpg;*.jpeg;*.bmp</system:String>
 
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Title">בחר קובץ וידאו</system:String>
     <system:String x:Key="Portal.ThemeCreate.DragDrop.Video.Filter">קבצי וידאו (*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4 )|*.mp4;*.avi;*.mov;*.mkv;*.ogv;*.flv;*.wmv;*.hevc;*.webm;*.mpeg;*.mpeg1;*.mpeg2;*.mpeg4</system:String>

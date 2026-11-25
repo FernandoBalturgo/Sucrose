@@ -102,6 +102,13 @@
                     Icon="{ui:SymbolIcon Gift16}"
                     TargetPageType="{x:Type pages:StorePage}"
                     ToolTipService.ToolTip="{DynamicResource Portal.MainWindow.MenuStoreTip}" />
+                <ui:NavigationViewItem
+                    Name="SteamGeneral"
+                    Content="Steam"
+                    Cursor="Hand"
+                    Icon="{ui:SymbolIcon Games24}"
+                    TargetPageType="{x:Type pages:SteamStorePage}"
+                    ToolTipService.ToolTip="{DynamicResource Portal.SteamPage.Title}" />
 
                 <ui:NavigationViewItem
                     Name="Setting1"
@@ -204,6 +211,18 @@
                         Cursor="Hand"
                         Icon="{ui:SymbolIcon WeatherMoon16}"
                         ToolTipService.ToolTip="{DynamicResource Portal.MainWindow.MenuDarkTip}" />
+                    <ui:NumberBox
+                        x:Name="AdaptiveLayout"
+                        Margin="0,0,5,0"
+                        ClearButtonEnabled="False"
+                        Icon="{ui:SymbolIcon NumberRow24}"
+                        IconPlacement="Left"
+                        MaxDecimalPlaces="0"
+                        MaxLength="2"
+                        Maximum="20"
+                        Minimum="1"
+                        MinWidth="80"
+                        ValueChanged="AdaptiveLayout_ValueChanged" />
                     <ui:Button
                         x:Name="Premium"
                         Margin="0,0,5,0"

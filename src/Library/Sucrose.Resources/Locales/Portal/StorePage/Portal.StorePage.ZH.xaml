@@ -10,4 +10,22 @@
     </ResourceDictionary.MergedDictionaries>
 
     <system:String x:Key="Portal.StorePage.Title">StorePage</system:String>
+    <system:String x:Key="Portal.SteamPage.Title">Steam Workshop</system:String>
+    <system:String x:Key="Portal.SteamPage.ApiKey">Steam Web API key</system:String>
+    <system:String x:Key="Portal.SteamPage.Search">Search Steam Workshop</system:String>
+    <system:String x:Key="Portal.SteamPage.Trending">Trending</system:String>
+    <system:String x:Key="Portal.SteamPage.Recent">Recent</system:String>
+    <system:String x:Key="Portal.SteamPage.Updated">Updated</system:String>
+    <system:String x:Key="Portal.SteamPage.MostSubscribed">Most subscribed</system:String>
+    <system:String x:Key="Portal.SteamPage.AllTags">All Tags</system:String>
+    <system:String x:Key="Portal.SteamPage.NeedKey">Enter a Steam Web API key to browse the Workshop.</system:String>
+    <system:String x:Key="Portal.SteamPage.NoItems">No workshop items were returned by Steam.</system:String>
+    <system:String x:Key="Portal.SteamPage.Untitled">(untitled)</system:String>
+    <system:String x:Key="Portal.SteamPage.Views">Views</system:String>
+    <system:String x:Key="Portal.SteamPage.Favorites">Favorites</system:String>
+    <system:String x:Key="Portal.SteamPage.Subscriptions">Subscriptions</system:String>
+    <system:String x:Key="Portal.SteamPage.OpenSteam">Open in Steam</system:String>
+    <system:String x:Key="Portal.SteamPage.NoDirect">Steam does not provide a direct download for this item. Use 'Open in Steam' and subscribe to it there.</system:String>
+    <system:String x:Key="Portal.SteamPage.NoMedia">This Workshop item has no supported video or gif file (scene and application wallpapers are not supported).</system:String>
+    <system:String x:Key="Portal.SteamPage.Replace">This will replace your current wallpaper. Press download again to confirm.</system:String>
 </ResourceDictionary>

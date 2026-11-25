@@ -1,4 +1,5 @@
-﻿using SHS = Skylark.Helper.Skymath;
+﻿using System;
+using SHS = Skylark.Helper.Skymath;
 using SMMCP = Sucrose.Memory.Manage.Constant.Portal;
 using SMMI = Sucrose.Manager.Manage.Internal;
 
@@ -6,6 +7,8 @@ namespace Sucrose.Manager.Manage
 {
     public static class Portal
     {
+        public static event EventHandler LayoutChanged;
+
         public static int BackgroundOpacity => SHS.Clamp(SMMI.PortalSettingManager.GetSettingStable(SMMCP.BackgroundOpacity, 100), 0, 100);
 
         public static int LibraryPagination => SHS.Clamp(SMMI.PortalSettingManager.GetSettingStable(SMMCP.LibraryPagination, 30), 1, 100);
@@ -13,6 +16,25 @@ namespace Sucrose.Manager.Manage
         public static int StorePagination => SHS.Clamp(SMMI.PortalSettingManager.GetSettingStable(SMMCP.StorePagination, 30), 1, 100);
 
         public static int AdaptiveLayout => SHS.Clamp(SMMI.PortalSettingManager.GetSettingStable(SMMCP.AdaptiveLayout, 0), 0, 100);
+
+        public static string SteamApiKey => SMMI.PortalSettingManager.GetSettingStable(SMMCP.SteamApiKey, string.Empty);
+
+        public static void SetSteamApiKey(string Value)
+        {
+            SMMI.PortalSettingManager.SetSetting(SMMCP.SteamApiKey, Value ?? string.Empty);
+        }
+
+        public static void SetAdaptiveLayout(int Value)
+        {
+            int NewValue = SHS.Clamp(Value, 0, 100);
+
+            if (NewValue != AdaptiveLayout)
+            {
+                SMMI.PortalSettingManager.SetSetting(SMMCP.AdaptiveLayout, NewValue);
+
+                LayoutChanged?.Invoke(null, EventArgs.Empty);
+            }
+        }
 
         public static int AdaptiveMargin => SHS.Clamp(SMMI.PortalSettingManager.GetSettingStable(SMMCP.AdaptiveMargin, 5), 5, 25);
 
